@@ -1,0 +1,499 @@
+html {
+    scroll-behavior: smooth;
+}
+
+html,
+body {
+    min-height: 100vh;
+    font-family: "Montserrat", sans-serif;
+    background: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ CORES \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+:root {
+    /* Cores principais */
+    --primary-blue: #0A84FF;
+    /* Azul principal (destaque, botões, links) */
+    --secondary-blue: #00D4FF;
+    /* Azul ciano (hover, glow, detalhes) */
+
+    /* Fundos */
+    --bg-dark: #0F1115;
+    /* Fundo principal do site */
+    --bg-navbar: #0B1C2D;
+    /* Navbar / topo */
+    --bg-card: #1A1F26;
+    /* Cards, seções */
+
+    /* Texto */
+    --text-primary: #E5E7EB;
+    /* Texto principal */
+    --text-secondary: #9CA3AF;
+    /* Texto secundário */
+    --text-inverse: #FFFFFF;
+    /* Texto sobre botões */
+
+    /* Bordas e detalhes */
+    --border-color: #2A2F36;
+    /* Bordas e divisores */
+    --shadow-color: rgba(0, 0, 0, 0.4);
+
+    /* Estados */
+    --success: #22C55E;
+    --warning: #FACC15;
+    --error: #EF4444;
+}
+
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ NAV BAR \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+header {
+    height: 80px;
+    /* altura fixa do header */
+    width: 100%;
+    background: var(--bg-navbar);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.nav-bar {
+    max-height: 100px;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+.nav-img img {
+    max-width: 150px;
+    height: auto;
+    margin-right: 30px;
+}
+
+.nav-bar ul {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    list-style: none;
+}
+
+.nav-bar ul li a {
+    font-size: 1em;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ MAIN \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+main {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 80px; /* Espaço para a navbar fixa */
+}
+
+main .container-img {
+    min-height: 70vh;
+    background-image: url('assets/homem-consertando-notebook.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+main .container-img .hero-text {
+    flex: 1;
+    max-width: 500px;
+    width: 100%;
+    color: var(--text-primary);
+    font-size: clamp(1rem, 1.3vw, 1.4rem);
+    line-height: 1.6;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    padding: 30px;
+    border-radius: 16px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+main .container-img .hero-text p:first-child,
+main .container-img .hero-text p:nth-child(2) {
+    color: var(--text-primary);
+    font-size: clamp(1rem, 1.2vw, 1.05rem);
+    line-height: 1.5;
+}
+
+main .container-img .hero-text p:nth-child(3) {
+    display: flex;
+    align-items: center;
+    font-size: clamp(0.9rem, 1vw, 1rem);
+    color: var(--text-secondary);
+}
+
+main .container-img .hero-text p i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    color: var(--secondary-blue);
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    margin-top: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+main .container-img .hero-text p a {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+main .container-img .hero-text .btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: var(--primary-blue);
+    color: var(--text-inverse);
+    text-decoration: none;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+main .container-img .hero-text .btn:hover {
+    background: var(--secondary-blue);
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SERVIÇOS \\\\\\\\\\\\\\\\\\\\\\\\\\ */ 
+
+main .sessao-servicos {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    scroll-margin-top: 30px;
+}
+
+main .sessao-servicos h2 {
+    margin: 50px 20px 30px;
+    color: var(--text-inverse);
+    text-align: center;
+    font-size: clamp(2rem, 2.5vw, 2.5rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+main .sessao-servicos .container-servicos {
+    min-height: 70vh;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 24px;
+}
+
+main .sessao-servicos .container-servicos .box-servicos {
+    min-height: 48vh;
+    width: min(100%, 320px);
+    background: linear-gradient(180deg, rgba(15, 17, 21, 0.96), rgba(26, 31, 38, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    padding: 32px 24px;
+    gap: 22px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(8px);
+}
+
+main .sessao-servicos .container-servicos .box-servicos::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 45%);
+    pointer-events: none;
+}
+
+main .sessao-servicos .container-servicos .box-servicos h3 {
+    margin: 0;
+    color: var(--text-inverse);
+    font-size: 1.35rem;
+    letter-spacing: 0.04em;
+    z-index: 1;
+}
+
+main .sessao-servicos .container-servicos .box-servicos p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 1rem;
+    max-width: 100%;
+    z-index: 1;
+}
+
+main .sessao-servicos .container-servicos .box-servicos img {
+    height: 140px;
+    width: 140px;
+    object-fit: contain;
+    border-radius: 18px;
+}
+
+main .sessao-servicos .container-servicos .box-servicos:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+    border-color: rgba(0, 212, 255, 0.35);
+        background: rgba(12, 14, 18, 0.95);
+}
+
+main .sessao-servicos .container-servicos .box-servicos:hover h3 {
+    color: var(--secondary-blue);
+}
+
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ CONTATO \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+#contato {
+    padding: 50px;
+    background: var(--bg-card);
+    text-align: center;
+    scroll-margin-top: 30px;
+}
+#contato h2 {
+    color: var(--text-inverse);
+    font-size: clamp(2rem, 2.5vw, 2.5rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    margin-bottom: 30px;
+}#contato form {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#contato label {
+    margin-top: 10px;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+#contato input, #contato textarea {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    resize: none;
+}
+
+#contato button {
+    padding: 10px;
+    background: var(--primary-blue);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#contato button:hover {
+    background: var(--secondary-blue);
+}
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ QUEM SOMOS \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+#quem-somos {
+    padding: 50px;
+    background: var(--bg-dark);
+    text-align: center;
+    color: var(--text-primary);
+    scroll-margin-top: 30px;
+}
+
+#quem-somos h2 {
+    margin-bottom: 20px;
+}
+
+#quem-somos p {
+    max-width: 800px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ FOOTER \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+footer {
+    padding: 20px;
+    background: #1128c0;
+    color: white;
+    text-align: center;
+}
+
+footer .footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ LOGIN PAGE \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+
+.container-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 20px;
+    background: var(--bg-dark);
+}
+
+.container-login h2 {
+    color: var(--text-primary);
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.container-login form {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-login label {
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.container-login input {
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.container-login input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.2);
+}
+
+.container-login button {
+    padding: 12px;
+    background: var(--primary-blue);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.container-login button:hover {
+    background: var(--secondary-blue);
+}
+
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ MEDIA QUERIES \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+
+@media (max-width: 768px) {
+    .nav-bar {
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    .nav-bar ul {
+        position: absolute;
+        top: 100px;
+        left: 0;
+        right: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg-navbar);
+        padding: 15px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-bar ul.show {
+        display: flex;
+    }
+
+    .nav-bar ul li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-bar ul li a {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .nav-img img {
+        max-width: 120px;
+    }
+
+    .container-servicos {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .box-servicos {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+}
