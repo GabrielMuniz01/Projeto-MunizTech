@@ -37,24 +37,44 @@
             </ul>
         </nav>
     </header>
-    <main>
-        <section class="container-login">
-            <h2>LOGIN</h2>
-            <form action="process_login.php" method="POST">
-                <label for="username">Usuário:</label>
-                <input type="text" id="username" name="username" required>
+    <main class="auth-page">
+        <div class="auth-container">
+            <div class="auth-box">
+                <!-- Formulário de Login -->
+                <form id="login-form" class="auth-form active" action="process_login.php" method="POST">
+                    <h2>Login do Cliente</h2>
+                    <p>Acesse sua conta para acompanhar seus serviços.</p>
+                    
+                    <div class="input-group">
+                        <input type="text" id="login-user" name="username" required placeholder=" ">
+                        <label for="login-user">Usuário ou E-mail</label>
+                    </div>
 
-                <label for="password">Senha:</label>
-                <input type="password" id="password" name="password" required>
+                    <div class="input-group">
+                        <input type="password" id="login-pass" name="password" required placeholder=" ">
+                        <label for="login-pass">Senha</label>
+                    </div>
 
-                <button type="submit">Entrar</button>
-            </form>
-        </section>
+                    <div class="form-options">
+                        <label><input type="checkbox"> Lembrar de mim</label>
+                        <a href="#">Esqueceu a senha?</a>
+                    </div>
 
+                    <button type="submit" class="btn-auth">ENTRAR NO PAINEL</button>
+
+                    <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Ainda não tem cadastro? <br> 
+                        <a href="Index.html#contato" style="color: var(--secondary-blue); text-decoration: none; font-weight: 600;">Solicite seu acesso aqui</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
     
     <footer>
-        <p>&copy; 2024 MunizTech. Todos os direitos reservados.</p>
+        <div class="footer-content">
+            <p>&copy; 2026 MunizTech. Atendimento rápido e confiável para notebooks.</p>
+        </div>
     </footer>
 
 
