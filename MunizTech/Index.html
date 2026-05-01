@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Serviços de manutenção e reparo de notebooks por MunizTech. Atendimento rápido e confiável para estudantes e profissionais.">
+    <link rel="icon" href="assets/favicon.ico" type="image/png" sizes="100x100">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <script src="https://kit.fontawesome.com/44fdb15698.js" crossorigin="anonymous"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Muniztech</title>
+</head>
+
+<body>
+    <header>
+
+        <nav class="nav-bar">
+
+            <a class="nav-img" href="Index.html">
+                <img src="./assets/icon muniztech.png" alt="Logo da Muniztech">
+            </a>
+
+            <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="main-menu" aria-expanded="false">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <ul id="main-menu">
+                <li><a href="#">HOME</a></li>
+                <li><a href="#quem-somos">QUEM SOMOS</a></li>
+                <li><a href="#servicos">SERVIÇOS</a></li>
+                <li><a href="#contato">CONTATO</a></li>
+                <li><a href="Login.html">LOGIN</a></li>
+            </ul>
+        </nav>
+
+    </header>
+    <main>
+        <section class="container-img">
+            <div class="hero-text">
+                <p>ATENDIMENTO RÁPIDO E DE CONFIANÇA!</p>
+                <p>ORÇAMENTO GRATUITO E SEM COMPROMISSO!</p> <br>
+                <p>
+                    Atendimento via WhatsApp <br>
+                    <i class="fa-brands fa-whatsapp" aria-hidden="true" style="color: #00D4FF;"></i>
+                    <a href="https://wa.me/5511976147581" target="_blank">(11) 97614-7581
+                    </a>
+                </p> <br>
+
+                <a class="btn" href="#servicos">CONHEÇA OS NOSSOS SERVIÇOS</a>
+            </div>
+        </section>
+        <section id="quem-somos">
+            <h2>QUEM SOMOS</h2>
+            <p>Somos a MunizTech, especializada em manutenção e reparo de notebooks. Fundada por Gabriel Muniz,
+                estudante de tecnologia e estagiário em desenvolvimento, oferecemos serviços de qualidade com foco em
+                rapidez e confiança. Nossa missão é ajudar você a manter seus dispositivos funcionando perfeitamente,
+                seja para estudos, trabalho ou lazer.</p>
+            <p>Como estudante e profissional em tech, entendemos as necessidades dos usuários modernos. Trabalhamos com
+                as melhores práticas para garantir que seu notebook tenha o melhor desempenho possível.</p>
+        </section>
+        <section class="sessao-servicos" id="servicos">
+
+            <h2>SERVIÇOS OFERECIDOS</h2>
+
+            <div class="container-servicos">
+
+                <div class="box-servicos">
+
+                    <img src="assets/Reparo.png" alt="Reparo técnico em notebooks" loading="lazy">
+
+                    <h3>Reparos Técnicos</h3>
+
+                    <p>Quando o notebook dá algum problema, tipo tela quebrada, teclado que parou de funcionar, ou a
+                        máquina nem liga mais, entra o reparo.</p>
+                </div>
+                <div class="box-servicos">
+
+                    <img src="assets/ManuteçãoPrevetiva.png" alt="Manutenção preventiva em notebooks" loading="lazy">
+
+                    <h3>Manutenção Preventiva</h3>
+
+                    <p>Esse tipo de serviço é feito para evitar falhas futuras e prolongar a vida útil do notebook.
+                        Ajuda a manter o desempenho do equipamento sempre em dia.</p>
+                </div>
+                <div class="box-servicos">
+
+                    <img src="assets/Upgrade.png" alt="Upgrade em notebooks" loading="lazy">
+
+                    <h3>Upgrade</h3>
+
+                    <p>O upgrade tem como objetivo melhorar o desempenho do notebook ou adicionar novos recursos. É
+                        ideal para quem quer mais velocidade, capacidade ou eficiência no dia a dia.</p>
+                </div>
+            </div>
+
+        </section>
+        <section id="contato">
+            <h2>CONTATO</h2>
+            <form action="#" method="post">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="mensagem">Mensagem:</label>
+                <textarea id="mensagem" name="mensagem" required></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 MunizTech. Atendimento rápido e confiável para notebooks.</p>
+            <p><a href="https://wa.me/5511976147581" target="_blank">WhatsApp: (11) 97614-7581</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-bar ul');
+
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+            const expanded = navMenu.classList.contains('show');
+            navToggle.setAttribute('aria-expanded', expanded);
+        });
+    </script>
+</body>
+
+</html>
