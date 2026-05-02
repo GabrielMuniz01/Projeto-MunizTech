@@ -44,7 +44,7 @@
                 <form id="login-form" class="auth-form active" action="process_login.php" method="POST">
                     <h2>Login do Cliente</h2>
                     <p>Acesse sua conta para acompanhar seus serviços.</p>
-                    
+
                     <div class="input-group">
                         <input type="text" id="login-user" name="username" required placeholder=" ">
                         <label for="login-user">Usuário ou E-mail</label>
@@ -62,15 +62,25 @@
 
                     <button type="submit" class="btn-auth">ENTRAR NO PAINEL</button>
 
-                    <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Ainda não tem cadastro? <br> 
-                        <a href="Index.html#contato" style="color: var(--secondary-blue); text-decoration: none; font-weight: 600;">Solicite seu acesso aqui</a></p>
+                    <!-- From Uiverse.io by satyamchaudharydev -->
+
+                    <div class="loading-overlay">
+                        <div class="loader"></div>
+                    </div>
+
+                    <div
+                        style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Ainda não tem cadastro? <br>
+                            <a href="Index.html#contato"
+                                style="color: var(--secondary-blue); text-decoration: none; font-weight: 600;">Solicite
+                                seu acesso aqui</a>
+                        </p>
                     </div>
                 </form>
             </div>
         </div>
     </main>
-    
+
     <footer>
         <div class="footer-content">
             <p>&copy; 2026 MunizTech. Atendimento rápido e confiável para notebooks.</p>

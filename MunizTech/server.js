@@ -1,6 +1,10 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
+// server.js - Arquivo principal do servidor Node.js usando Express
+// Este arquivo configura um servidor Express que se conecta a um banco de dados MySQL e define rotas para listar serviços e cadastrar usuários.
+// Importações necessárias para o servidor
+// Importa o framework Express para criar o servidor
+const express = require('express'); // Importa o framework Express para criar o servidor
+const mysql = require('mysql2'); // Importa o módulo mysql2 para conectar ao banco de dados MySQL
+const cors = require('cors'); // Importa o módulo cors para permitir requisições de diferentes origens (útil para desenvolvimento local);
 
 const app = express();
 
@@ -27,7 +31,8 @@ db.connect((err) => {
 
 // 2. Criando a nossa primeira ROTA (O caminho que o site vai chamar)
 //  Vamos criar uma rota que lista os serviços do banco de dados
-app.get('/servicos', (req, res) => { 
+
+app.get('/servicos', (req, res) => {
     const sql = 'SELECT * FROM tbl_categorias_servicos'; // A consulta SQL para selecionar todos os serviços
     db.query(sql, (err, results) => { // Executa a consulta
         if (err) {
@@ -36,6 +41,23 @@ app.get('/servicos', (req, res) => {
             return;
         }
         res.status(200).json(results); // Retorna os resultados para o cliente
+    });
+});
+
+// Rota para cadastrar um novo usuário
+app.post('/usuario', (req, res) => { // Rota para cadastrar um novo usuário
+    const { nome, email, username, password } = req.body; // Extrai os dados do corpo da requisição
+    const sql = 'INSERT INTO tbl_usuarios (nome_completo, email, username, senha) VALUES (?, ?, ?, ?)';
+    console.log(req.body);
+
+    db.query(sql, [nome, email, username, password], (err, result) => {
+
+        if (err) {
+            console.error('Erro ao salvar no banco de dados:', err);
+            return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+        }
+
+        res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
     });
 });
 

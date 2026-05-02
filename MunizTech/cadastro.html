@@ -37,10 +37,10 @@
     <main class="auth-page">
         <div class="auth-container">
             <div class="auth-box">
-                <form id="register-form" class="auth-form active" action="process_register.php" method="POST">
+                <form id="register-form" class="auth-form active" method="POST">
                     <h2>Novo Cadastro</h2>
                     <p>Área restrita para criação de novas contas de clientes.</p>
-                    
+
                     <div class="input-group">
                         <input type="text" id="reg-nome" name="nome" required placeholder=" ">
                         <label for="reg-nome">Nome Completo</label>
@@ -62,15 +62,29 @@
                     </div>
 
                     <button type="submit" class="btn-auth">REALIZAR CADASTRO</button>
-                    
+
+                    <!-- From Uiverse.io by bociKond -->
+                    <div class="loading-overlay">
+                        <div class="spinner">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+
                     <div style="margin-top: 20px; text-align: center;">
-                        <a href="Login.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;">← Voltar para o Login</a>
+                        <a href="Login.html"
+                            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;">← Voltar
+                            para o Login</a>
                     </div>
                 </form>
             </div>
         </div>
     </main>
-    
+
     <footer>
         <div class="footer-content">
             <p>&copy; 2026 MunizTech. Atendimento rápido e confiável para notebooks.</p>
@@ -78,14 +92,55 @@
     </footer>
 
     <script>
-        const navToggle = document.querySelector('.nav-toggle');
-        const navMenu = document.querySelector('.nav-bar ul');
+        const navToggle = document.querySelector('.nav-toggle'); // Seleciona o botão de toggle do menu
+        const navMenu = document.querySelector('.nav-bar ul'); // Seleciona o menu de navegação
 
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('show');
-            const expanded = navMenu.classList.contains('show');
-            navToggle.setAttribute('aria-expanded', expanded);
+        navToggle.addEventListener('click', () => { // Adiciona um evento de clique ao botão de toggle
+            navMenu.classList.toggle('show'); // Alterna a classe 'show' no menu para mostrar ou esconder o menu
+            const expanded = navMenu.classList.contains('show'); // Verifica se o menu está atualmente mostrado
+            navToggle.setAttribute('aria-expanded', expanded); // Atualiza o atributo aria-expanded para refletir o estado atual do menu
         });
+
+
+        const registerForm = document.getElementById('register-form');
+        registerForm.addEventListener('submit', async (event) => { // Adiciona um evento de submit ao formulário de registro.
+            event.preventDefault(); // Impede o comportamento padrão de envio do formulário para que possamos lidar com ele via JavaScript.
+
+            const nome = document.getElementById('reg-nome').value; // Obter o valor do campo de nome
+            const email = document.getElementById('reg-email').value; // Obter o valor do campo de email
+            const username = document.getElementById('reg-user').value; // Obter o valor do campo de username
+            const password = document.getElementById('reg-pass').value; // Obter o valor do campo de password
+
+            try { // Enviar os dados para o servidor
+                const response = await fetch('http://localhost:3000/usuario', { // Certifique-se de que a URL esteja correta
+                    method: 'POST', // Método HTTP para enviar dados
+                    headers: {
+                        'Content-Type': 'application/json' // Especifica que os dados estão no formato JSON
+                    },
+                    body: JSON.stringify({ nome, email, username, password }) // Converte os dados do formulário para JSON
+                });
+
+                const data = await response.json(); // Aguarda a resposta do servidor e converte para JSON
+
+                if (response.ok) { // Verifica se a resposta foi bem-sucedida
+                    alert('✅ Usuário cadastrado com sucesso!' + data.message)
+                    // Exibe uma mensagem de sucesso
+                    document.querySelector('.loading-overlay').style.display = 'flex'; // Exibe a sobreposição de carregamento
+                    setTimeout(() => {
+                        window.location.href = 'Login.html'; // Redireciona para a página de login após o cadastro
+                    }, 5000); // Aguarda 2 segundos antes de redirecionar
+
+                } else {
+                    alert('❌ Erro ao cadastrar usuário: '); // Exibe uma mensagem de erro caso o cadastro falhe
+                }
+            } catch (error) {
+                console.error('Erro ao enviar dados para o servidor:', error); // Loga o erro no console
+                alert('❌ Ocorreu um erro ao tentar cadastrar. Por favor, tente novamente.'); // Exibe uma mensagem de erro genérica
+            }
+        });
+
+
+
     </script>
 </body>
 
