@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/favicon.ico" type="image/png" sizes="100x100">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cadastro.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
@@ -15,6 +16,7 @@
 </head>
 
 <body>
+    <div class="menu-overlay"></div>
     <header>
         <nav class="nav-bar">
             <a class="nav-img" href="Index.html">
@@ -22,7 +24,9 @@
             </a>
             <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="main-menu"
                 aria-expanded="false">
-                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <ul id="main-menu">
                 <li><a href="Index.html">HOME</a></li>
@@ -61,19 +65,21 @@
                         <label for="reg-pass">Definir Senha</label>
                     </div>
 
-                    <button type="submit" class="btn-auth">REALIZAR CADASTRO</button>
-
-                    <!-- From Uiverse.io by bociKond -->
-                    <div class="loading-overlay">
-                        <div class="spinner">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                    <button type="submit" class="btn-auth" id="btn-register">
+                        <span class="btn-text">REALIZAR CADASTRO</span>
+                        <div class="spinner-container">
+                            <div class="spinner">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
                         </div>
-                    </div>
+                    </button>
+                    
+                    <div id="register-message"></div>
 
                     <div style="margin-top: 20px; text-align: center;">
                         <a href="Login.html"
@@ -92,50 +98,72 @@
     </footer>
 
     <script>
-        const navToggle = document.querySelector('.nav-toggle'); // Seleciona o botão de toggle do menu
-        const navMenu = document.querySelector('.nav-bar ul'); // Seleciona o menu de navegação
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-bar ul');
+        const menuOverlay = document.querySelector('.menu-overlay');
 
-        navToggle.addEventListener('click', () => { // Adiciona um evento de clique ao botão de toggle
-            navMenu.classList.toggle('show'); // Alterna a classe 'show' no menu para mostrar ou esconder o menu
-            const expanded = navMenu.classList.contains('show'); // Verifica se o menu está atualmente mostrado
-            navToggle.setAttribute('aria-expanded', expanded); // Atualiza o atributo aria-expanded para refletir o estado atual do menu
-        });
+        function toggleMenu() {
+            navToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            const isExpanded = navToggle.classList.contains('active');
+            navToggle.setAttribute('aria-expanded', isExpanded);
+            document.body.style.overflow = isExpanded ? 'hidden' : 'auto';
+        }
+
+        navToggle.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
 
 
         const registerForm = document.getElementById('register-form');
-        registerForm.addEventListener('submit', async (event) => { // Adiciona um evento de submit ao formulário de registro.
-            event.preventDefault(); // Impede o comportamento padrão de envio do formulário para que possamos lidar com ele via JavaScript.
 
-            const nome = document.getElementById('reg-nome').value; // Obter o valor do campo de nome
-            const email = document.getElementById('reg-email').value; // Obter o valor do campo de email
-            const username = document.getElementById('reg-user').value; // Obter o valor do campo de username
-            const password = document.getElementById('reg-pass').value; // Obter o valor do campo de password
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-            try { // Enviar os dados para o servidor
-                const response = await fetch('http://localhost:3000/usuario', { // Certifique-se de que a URL esteja correta
-                    method: 'POST', // Método HTTP para enviar dados
+            const btnRegister = document.getElementById('btn-register');
+            const registerMessage = document.getElementById('register-message');
+            const nome = document.getElementById('reg-nome').value;
+            const email = document.getElementById('reg-email').value;
+            const username = document.getElementById('reg-user').value;
+            const password = document.getElementById('reg-pass').value;
+
+            // Limpa mensagens e ativa carregamento
+            registerMessage.textContent = '';
+            registerMessage.className = '';
+            btnRegister.classList.add('loading');
+            btnRegister.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/usuario', {
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' // Especifica que os dados estão no formato JSON
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ nome, email, username, password }) // Converte os dados do formulário para JSON
+                    body: JSON.stringify({ nome, email, username, password })
                 });
 
-                const data = await response.json(); // Aguarda a resposta do servidor e converte para JSON
+                const data = await response.json();
 
-                if (response.ok) { // Verifica se a resposta foi bem-sucedida
-                    alert('✅ Usuário cadastrado com sucesso!' + data.message)
-                    // Exibe uma mensagem de sucesso
-                    document.querySelector('.loading-overlay').style.display = 'flex'; // Exibe a sobreposição de carregamento
+                if (response.ok) {
+                    registerMessage.textContent = '✅ Usuário cadastrado com sucesso! Redirecionando...';
+                    registerMessage.className = 'success';
+
                     setTimeout(() => {
-                        window.location.href = 'Login.html'; // Redireciona para a página de login após o cadastro
-                    }, 5000); // Aguarda 2 segundos antes de redirecionar
+                        window.location.href = 'Login.html';
+                    }, 4500);
 
                 } else {
-                    alert('❌ Erro ao cadastrar usuário: '); // Exibe uma mensagem de erro caso o cadastro falhe
+                    registerMessage.textContent = '❌ ' + (data.error || 'Erro ao cadastrar usuário.');
+                    registerMessage.className = 'error';
+                    btnRegister.classList.remove('loading');
+                    btnRegister.disabled = false;
                 }
             } catch (error) {
-                console.error('Erro ao enviar dados para o servidor:', error); // Loga o erro no console
-                alert('❌ Ocorreu um erro ao tentar cadastrar. Por favor, tente novamente.'); // Exibe uma mensagem de erro genérica
+                console.error('Erro ao enviar dados para o servidor:', error);
+                registerMessage.textContent = '❌ Erro de conexão com o servidor.';
+                registerMessage.className = 'error';
+                btnRegister.classList.remove('loading');
+                btnRegister.disabled = false;
             }
         });
 

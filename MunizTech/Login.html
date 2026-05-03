@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/favicon.ico" type="image/png" sizes="100x100">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
@@ -19,6 +20,7 @@
 </head>
 
 <body>
+    <div class="menu-overlay"></div>
     <header>
         <nav class="nav-bar">
             <a class="nav-img" href="Index.html">
@@ -26,14 +28,16 @@
             </a>
             <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="main-menu"
                 aria-expanded="false">
-                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <ul id="main-menu">
                 <li><a href="Index.html">HOME</a></li>
-                <li><a href="#quem-somos">QUEM SOMOS</a></li>
-                <li><a href="#servicos">SERVIÇOS</a></li>
-                <li><a href="#contato">CONTATO</a></li>
-                <li><a href="Login.html">LOGIN</a></li>
+                <li><a href="Index.html#quem-somos">QUEM SOMOS</a></li>
+                <li><a href="Index.html#servicos">SERVIÇOS</a></li>
+                <li><a href="Index.html#contato">CONTATO</a></li>
+                <li><a href="#">LOGIN</a></li>
             </ul>
         </nav>
     </header>
@@ -41,7 +45,7 @@
         <div class="auth-container">
             <div class="auth-box">
                 <!-- Formulário de Login -->
-                <form id="login-form" class="auth-form active" action="process_login.php" method="POST">
+                <form id="login-form" class="auth-form active" method="POST">
                     <h2>Login do Cliente</h2>
                     <p>Acesse sua conta para acompanhar seus serviços.</p>
 
@@ -60,13 +64,21 @@
                         <a href="#">Esqueceu a senha?</a>
                     </div>
 
-                    <button type="submit" class="btn-auth">ENTRAR NO PAINEL</button>
-
-                    <!-- From Uiverse.io by satyamchaudharydev -->
-
-                    <div class="loading-overlay">
-                        <div class="loader"></div>
-                    </div>
+                    <button type="submit" class="btn-auth" id="btn-login">
+                        <span class="btn-text">ENTRAR NO PAINEL</span>
+                        <div class="spinner-container">
+                            <div class="spinner">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <div id="login-message"></div>
 
                     <div
                         style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
@@ -91,3 +103,81 @@
 </body>
 
 </html>
+
+<script>
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-bar ul');
+    const menuOverlay = document.querySelector('.menu-overlay');
+
+    function toggleMenu() {
+        navToggle.classList.toggle('active');
+        navMenu.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+        const isExpanded = navToggle.classList.contains('active');
+        navToggle.setAttribute('aria-expanded', isExpanded);
+        document.body.style.overflow = isExpanded ? 'hidden' : 'auto';
+    }
+
+    navToggle.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    const loginForm = document.getElementById('login-form');
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Impede o envio tradicional do formulário
+
+        const btnLogin = document.getElementById('btn-login');
+        const loginMessage = document.getElementById('login-message');
+        const username = document.getElementById('login-user').value;
+        const password = document.getElementById('login-pass').value;
+
+        // Limpa mensagens anteriores e ativa estado de carregamento
+        loginMessage.textContent = '';
+        loginMessage.className = '';
+        btnLogin.classList.add('loading');
+        btnLogin.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Sucesso no login
+                loginMessage.textContent = '✅ Login bem-sucedido! Redirecionando...';
+                loginMessage.className = 'success';
+
+                sessionStorage.setItem('userId', data.user.id);
+                sessionStorage.setItem('nameUser', data.user.nome);
+                sessionStorage.setItem('userEmail', data.user.email);
+                sessionStorage.setItem('userName', data.user.username);
+
+                // Redireciona após um curto delay para o usuário ver a mensagem de sucesso
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+
+            } else {
+                // Erro retornado pelo servidor
+                loginMessage.textContent = '❌ ' + (data.error || 'Usuário ou senha incorretos.');
+                loginMessage.className = 'error';
+                btnLogin.classList.remove('loading');
+                btnLogin.disabled = false;
+            }
+        } catch (error) {
+            console.error('Erro ao enviar dados para o servidor:', error);
+            loginMessage.textContent = '❌ Erro de conexão. Verifique se o servidor está rodando.';
+            loginMessage.className = 'error';
+            btnLogin.classList.remove('loading');
+            btnLogin.disabled = false;
+        }
+    });
+
+
+</script>

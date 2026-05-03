@@ -7,7 +7,7 @@
     <meta name="description"
         content="Serviços de manutenção e reparo de notebooks por MunizTech. Atendimento rápido e confiável para estudantes e profissionais.">
     <link rel="icon" href="assets/favicon.ico" type="image/png" sizes="100x100">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
@@ -21,6 +21,7 @@
 </head>
 
 <body>
+    <div class="menu-overlay"></div>
     <header>
 
         <nav class="nav-bar">
@@ -29,8 +30,11 @@
                 <img src="./assets/icon muniztech.png" alt="Logo da Muniztech">
             </a>
 
-            <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="main-menu" aria-expanded="false">
-                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-controls="main-menu"
+                aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <ul id="main-menu">
                 <li><a href="#">HOME</a></li>
@@ -52,8 +56,9 @@
                     <span>ATENDIMENTO EXPRESSO EM SÃO PAULO</span>
                 </div>
                 <h1>Seu Notebook em <span>Boas Mãos</span></h1>
-                <p>Manutenção especializada, orçamentos gratuitos e o melhor custo-benefício da região. Não deixe seus projetos parados!</p>
-                
+                <p>Manutenção especializada, orçamentos gratuitos e o melhor custo-benefício da região. Não deixe seus
+                    projetos parados!</p>
+
                 <div class="hero-actions">
                     <a class="btn-primary" href="#servicos">
                         Ver Serviços
@@ -71,8 +76,12 @@
             <div class="container-quem-somos">
                 <div class="texto-quem-somos">
                     <h2>QUEM SOMOS</h2>
-                    <p>Somos a <span>MunizTech</span>, especializada em manutenção e reparo de notebooks. Fundada por Gabriel Muniz, estudante de tecnologia e estagiário em desenvolvimento, oferecemos serviços de qualidade com foco em rapidez e confiança.</p>
-                    <p>Nossa missão é ajudar você a manter seus dispositivos funcionando perfeitamente, seja para estudos, trabalho ou lazer. Como entusiastas de tecnologia, entendemos a urgência e a importância do seu equipamento no dia a dia.</p>
+                    <p>Somos a <span>MunizTech</span>, especializada em manutenção e reparo de notebooks. Fundada por
+                        Gabriel Muniz, estudante de tecnologia e estagiário em desenvolvimento, oferecemos serviços de
+                        qualidade com foco em rapidez e confiança.</p>
+                    <p>Nossa missão é ajudar você a manter seus dispositivos funcionando perfeitamente, seja para
+                        estudos, trabalho ou lazer. Como entusiastas de tecnologia, entendemos a urgência e a
+                        importância do seu equipamento no dia a dia.</p>
                     <div class="stats-quem-somos">
                         <div class="stat-item">
                             <i class="fa-solid fa-laptop-medical"></i>
@@ -101,7 +110,8 @@
                         <img src="assets/Reparo.png" alt="Reparo técnico em notebooks" loading="lazy">
                     </div>
                     <h3>Reparos Técnicos</h3>
-                    <p>Troca de telas, teclados, baterias e reparos avançados em placa-mãe. Soluções rápidas para seu notebook voltar à vida.</p>
+                    <p>Troca de telas, teclados, baterias e reparos avançados em placa-mãe. Soluções rápidas para seu
+                        notebook voltar à vida.</p>
                     <a href="https://wa.me/5511976147581" class="btn-card" target="_blank">Solicitar Orçamento</a>
                 </div>
                 <div class="box-servicos">
@@ -109,7 +119,8 @@
                         <img src="assets/ManuteçãoPrevetiva.png" alt="Manutenção preventiva em notebooks" loading="lazy">
                     </div>
                     <h3>Manutenção Preventiva</h3>
-                    <p>Limpeza interna, troca de pasta térmica e otimização do sistema para evitar superaquecimento e lentidão.</p>
+                    <p>Limpeza interna, troca de pasta térmica e otimização do sistema para evitar superaquecimento e
+                        lentidão.</p>
                     <a href="https://wa.me/5511976147581" class="btn-card" target="_blank">Solicitar Orçamento</a>
                 </div>
                 <div class="box-servicos">
@@ -128,8 +139,9 @@
             <div class="container-contato">
                 <div class="contato-info">
                     <h2>VAMOS CONVERSAR?</h2>
-                    <p>Precisa de um orçamento ou tem alguma dúvida? Entre em contato por um dos nossos canais ou preencha o formulário ao lado.</p>
-                    
+                    <p>Precisa de um orçamento ou tem alguma dúvida? Entre em contato por um dos nossos canais ou
+                        preencha o formulário ao lado.</p>
+
                     <div class="info-list">
                         <div class="info-item">
                             <i class="fa-brands fa-whatsapp"></i>
@@ -156,12 +168,12 @@
                 </div>
 
                 <div class="contato-form">
-                    <form action="#" method="post">
+                    <form id="contato-form">
                         <div class="input-group">
                             <input type="text" id="nome" name="nome" required placeholder=" ">
                             <label for="nome">Nome Completo</label>
                         </div>
-                        
+
                         <div class="input-group">
                             <input type="email" id="email" name="email" required placeholder=" ">
                             <label for="email">Seu melhor E-mail</label>
@@ -172,10 +184,11 @@
                             <label for="mensagem">Como podemos ajudar?</label>
                         </div>
 
-                        <button type="submit" class="btn-enviar">
-                            <span>ENVIAR MENSAGEM</span>
-                            <i class="fa-solid fa-paper-plane"></i>
+                        <button type="submit" class="btn-enviar" id="btn-contato">
+                            <span class="btn-text">ENVIAR MENSAGEM</span>
+                            <i class="fa-solid fa-paper-plane btn-icon"></i>
                         </button>
+                        <div id="contato-message" style="margin-top: 15px; text-align: center; border-radius: 8px; padding: 10px; display: none;"></div>
                     </form>
                 </div>
             </div>
@@ -190,11 +203,28 @@
     <script>
         const navToggle = document.querySelector('.nav-toggle');
         const navMenu = document.querySelector('.nav-bar ul');
+        const menuOverlay = document.querySelector('.menu-overlay');
 
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('show');
-            const expanded = navMenu.classList.contains('show');
-            navToggle.setAttribute('aria-expanded', expanded);
+        function toggleMenu() {
+            navToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            
+            const isExpanded = navToggle.classList.contains('active');
+            navToggle.setAttribute('aria-expanded', isExpanded);
+            
+            // Impede scroll no corpo quando menu está aberto
+            document.body.style.overflow = isExpanded ? 'hidden' : 'auto';
+        }
+
+        navToggle.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+
+        // Fecha menu ao clicar em um link
+        document.querySelectorAll('.nav-bar ul li a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu.classList.contains('active')) toggleMenu();
+            });
         });
 
         async function buscarServicos() {
@@ -228,6 +258,54 @@
 
         // Chama a função para buscar os serviços quando a página carregar
         buscarServicos();
+
+        // Lógica do Formulário de Contato
+        const contatoForm = document.getElementById('contato-form');
+        contatoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btnContato = document.getElementById('btn-contato');
+            const msgArea = document.getElementById('contato-message');
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const mensagem = document.getElementById('mensagem').value;
+
+            // Estado de carregamento
+            btnContato.disabled = true;
+            btnContato.style.opacity = '0.7';
+            msgArea.style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:3000/contato', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, mensagem })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    msgArea.textContent = '✅ Mensagem enviada com sucesso! Entraremos em contato em breve.';
+                    msgArea.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    msgArea.style.color = '#22C55E';
+                    msgArea.style.display = 'block';
+                    contatoForm.reset();
+                } else {
+                    msgArea.textContent = '❌ ' + (data.error || 'Erro ao enviar mensagem.');
+                    msgArea.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    msgArea.style.color = '#EF4444';
+                    msgArea.style.display = 'block';
+                }
+            } catch (error) {
+                msgArea.textContent = '❌ Erro de conexão. Tente novamente mais tarde.';
+                msgArea.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                msgArea.style.color = '#EF4444';
+                msgArea.style.display = 'block';
+            } finally {
+                btnContato.disabled = false;
+                btnContato.style.opacity = '1';
+            }
+        });
     </script>
 </body>
 
