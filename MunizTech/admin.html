@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/44fdb15698.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <title>Painel Administrativo - MunizTech</title>
+    <style>
+        /* Ajustes específicos para o Admin */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--card-white);
+            padding: 30px; border-radius: 10px; width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-primary); }
+        .form-group select, .form-group input {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            background: var(--bg-dashboard); color: var(--text-primary); border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <img src="./assets/logo canva muniztech.png" alt="Logo MunizTech" class="logo">
+            <ul class="sidebar-menu">
+                <li><a onclick="showSection('admin-dashboard')" id="menu-dash" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a onclick="showSection('admin-ordens')" id="menu-ordens"><i class="fas fa-file-invoice-dollar"></i> Gerenciar O.S</a></li>
+                <li><a onclick="showSection('admin-relatorios')" id="menu-relatorios"><i class="fas fa-chart-pie"></i> Relatórios</a></li>
+                <li><a onclick="showSection('admin-usuarios')" id="menu-users"><i class="fas fa-users-cog"></i> Usuários</a></li>
+                <li><a href="cadastro.html"><i class="fas fa-user-plus"></i> Novo Usuário</a></li>
+                <li><a onclick="showSection('config-section')" id="menu-config"><i class="fas fa-cog"></i> Configurações</a></li>
+                <li><a href="Login.html" style="margin-top: 50px; color: #ff4d4d;" id="btn_sair"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <!-- DASHBOARD & KPIs -->
+            <section id="admin-dashboard" class="content-section active">
+                <header class="header-dash">
+                    <div>
+                        <h1>Painel Administrativo</h1>
+                        <p>Visão geral do negócio.</p>
+                    </div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Total Clientes</h3>
+                        <p id="kpi-clientes">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Total de O.S</h3>
+                        <p id="kpi-ordens">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>O.S Ativas</h3>
+                        <p id="kpi-ativas">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <h3>Faturamento</h3>
+                        <p id="kpi-faturamento">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <div class="charts-row" style="grid-template-columns: 1fr;">
+                    <div class="table-box">
+                        <h4>Últimas Mensagens de Contato</h4>
+                        <table id="table-contatos">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Mensagem</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GERENCIAR ORDENS DE SERVIÇO -->
+            <section id="admin-ordens" class="content-section">
+                <header class="header-dash">
+                    <h1>Gerenciar Ordens de Serviço</h1>
+                    <button onclick="abrirModalNovaOS()" class="btn-theme" style="background: #28a745;"><i class="fas fa-plus"></i> Nova O.S</button>
+                </header>
+                <div class="table-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Equipamento</th>
+                                <th>Serviço</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ordens">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- GERENCIAR USUÁRIOS -->
+            <section id="admin-usuarios" class="content-section">
+                <header class="header-dash">
+                    <h1>Gerenciar Usuários</h1>
+                </header>
+                <div class="table-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Username</th>
+                                <th>E-mail</th>
+                                <th>Perfil</th>
+                                <th>Cadastro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-usuarios">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SEÇÃO RELATÓRIOS -->
+            <section id="admin-relatorios" class="content-section">
+                <header class="header-dash">
+                    <h1>Relatórios e Análises</h1>
+                    <p>Visão detalhada do desempenho da MunizTech.</p>
+                </header>
+
+                <div class="charts-row" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+                    <div class="chart-box" style="min-height: 300px;">
+                        <h4>Faturamento Mensal (R$)</h4>
+                        <canvas id="chart-faturamento"></canvas>
+                    </div>
+                    <div class="chart-box" style="min-height: 300px;">
+                        <h4>Distribuição de Serviços</h4>
+                        <canvas id="chart-servicos"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="chart-box" style="min-height: 300px;">
+                        <h4>Novos Clientes</h4>
+                        <canvas id="chart-clientes"></canvas>
+                    </div>
+                    <div class="chart-box" style="min-height: 300px;">
+                        <h4>Mensagens de Contato</h4>
+                        <canvas id="chart-contatos"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONFIGURAÇÕES (REUTILIZADO) -->
+            <section id="config-section" class="content-section">
+                <header class="header-dash">
+                    <h1>Configurações</h1>
+                </header>
+                <div class="config-box">
+                    <h4>Preferências de Exibição</h4>
+                    <div class="config-item">
+                        <div class="config-info">
+                            <h5>Tema do Painel</h5>
+                            <p>Alterne entre o modo claro e o modo escuro.</p>
+                        </div>
+                        <button id="theme-toggle" class="btn-theme">
+                            <i class="fas fa-moon"></i>
+                            <span id="theme-text">Tema Escuro</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal Nova O.S -->
+    <div id="modal-nova-os" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--text-primary); margin-bottom: 20px;">Nova Ordem de Serviço</h2>
+            <div class="form-group">
+                <label>Cliente</label>
+                <select id="new-os-cliente"></select>
+            </div>
+            <div class="form-group">
+                <label>Tipo de Serviço</label>
+                <select id="new-os-categoria"></select>
+            </div>
+            <div class="form-group">
+                <label>Modelo do Equipamento</label>
+                <input type="text" id="new-os-equipamento" placeholder="Ex: Notebook Dell G15">
+            </div>
+            <div class="form-group">
+                <label>Descrição do Problema</label>
+                <input type="text" id="new-os-problema" placeholder="Ex: Não liga">
+            </div>
+            <div class="form-group">
+                <label>Valor Inicial (R$)</label>
+                <input type="number" id="new-os-valor" step="0.01" value="0.00">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="salvarNovaOS()" class="btn-theme" style="flex: 1; justify-content: center;">Criar O.S</button>
+                <button onclick="fecharModalNovaOS()" class="btn-theme" style="flex: 1; justify-content: center; background: #6c757d;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de O.S -->
+    <div id="modal-os" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--text-primary); margin-bottom: 20px;">Atualizar Ordem</h2>
+            <input type="hidden" id="edit-os-id">
+            <div class="form-group">
+                <label>Status</label>
+                <select id="edit-os-status">
+                    <option value="Analise">Em Análise</option>
+                    <option value="Manutencao">Em Manutenção</option>
+                    <option value="Aguardando Pecas">Aguardando Peças</option>
+                    <option value="Pronto">Pronto</option>
+                    <option value="Entregue">Entregue</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Valor Total (R$)</label>
+                <input type="number" id="edit-os-valor" step="0.01">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="salvarEdicaoOS()" class="btn-theme" style="flex: 1; justify-content: center;">Salvar</button>
+                <button onclick="fecharModal()" class="btn-theme" style="flex: 1; justify-content: center; background: #6c757d;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Usuário -->
+    <div id="modal-usuario" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--text-primary); margin-bottom: 20px;">Editar Usuário</h2>
+            <input type="hidden" id="edit-user-id">
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="edit-user-nome">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="edit-user-email">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="edit-user-username">
+            </div>
+            <div class="form-group">
+                <label>Perfil</label>
+                <select id="edit-user-perfil">
+                    <option value="cliente">Cliente</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="salvarEdicaoUsuario()" class="btn-theme" style="flex: 1; justify-content: center;">Salvar</button>
+                <button onclick="fecharModalUsuario()" class="btn-theme" style="flex: 1; justify-content: center; background: #6c757d;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Navegação e Temas ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            const menuId = {
+                'admin-dashboard': 'menu-dash',
+                'admin-ordens': 'menu-ordens',
+                'admin-relatorios': 'menu-relatorios',
+                'admin-usuarios': 'menu-users',
+                'config-section': 'menu-config'
+            }[sectionId];
+            if(menuId) document.getElementById(menuId).classList.add('active');
+
+            if(sectionId === 'admin-dashboard') {
+                carregarKPIs();
+                carregarContatosAdmin();
+            }
+            if(sectionId === 'admin-relatorios') carregarGraficosRelatorios();
+            if(sectionId === 'admin-ordens') {
+                carregarOrdensAdmin();
+                carregarSelectsOS();
+            }
+            if(sectionId === 'admin-usuarios') carregarUsuariosAdmin();
+        }
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || savedTheme === null) {
+            body.classList.add('dark-theme');
+            document.getElementById('theme-text').innerText = 'Tema Claro';
+        }
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            const isDark = body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-text').innerText = isDark ? 'Tema Claro' : 'Tema Escuro';
+        });
+
+        // --- Carregar KPIs ---
+        async function carregarKPIs() {
+            const res = await fetch('/admin/resumo');
+            const data = await res.json();
+            document.getElementById('kpi-clientes').innerText = data.totalClientes;
+            document.getElementById('kpi-ordens').innerText = data.totalOrdens;
+            document.getElementById('kpi-ativas').innerText = data.ordensAtivas;
+            document.getElementById('kpi-faturamento').innerText = `R$ ${parseFloat(data.faturamento || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        // --- Gerenciar O.S ---
+        async function carregarOrdensAdmin() {
+            const res = await fetch('/admin/ordens');
+            const ordens = await res.json();
+            const tbody = document.getElementById('tbody-ordens');
+            tbody.innerHTML = '';
+            ordens.forEach(os => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${os.nome_cliente}</td>
+                    <td>${os.equipamento_modelo}</td>
+                    <td>${os.titulo_servico}</td>
+                    <td>R$ ${parseFloat(os.valor_total).toFixed(2)}</td>
+                    <td><span class="status-badge status-${os.status_servico.toLowerCase().replace(' ', '-')}">${os.status_servico}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="abrirModal(${os.id_os}, '${os.status_servico}', ${os.valor_total})" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #ffc107; color: #000;"><i class="fas fa-edit"></i></button>
+                            <button onclick="deletarOS(${os.id_os})" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #dc3545;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function carregarSelectsOS() {
+            const resClientes = await fetch('/admin/clientes');
+            const clientes = await resClientes.json();
+            document.getElementById('new-os-cliente').innerHTML = clientes.map(c => `<option value="${c.id_usuario}">${c.nome_completo}</option>`).join('');
+
+            const resCats = await fetch('/admin/categorias');
+            const cats = await resCats.json();
+            document.getElementById('new-os-categoria').innerHTML = cats.map(cat => `<option value="${cat.id_categoria}">${cat.titulo_servico}</option>`).join('');
+        }
+
+        function abrirModalNovaOS() { document.getElementById('modal-nova-os').style.display = 'flex'; }
+        function fecharModalNovaOS() { document.getElementById('modal-nova-os').style.display = 'none'; }
+
+        async function salvarNovaOS() {
+            const dados = {
+                id_cliente: document.getElementById('new-os-cliente').value,
+                id_categoria: document.getElementById('new-os-categoria').value,
+                equipamento_modelo: document.getElementById('new-os-equipamento').value,
+                descricao_problema: document.getElementById('new-os-problema').value,
+                valor_total: document.getElementById('new-os-valor').value
+            };
+            const res = await fetch('/admin/ordens', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+            if (res.ok) {
+                fecharModalNovaOS();
+                carregarOrdensAdmin();
+                carregarKPIs();
+                alert('O.S Criada!');
+            }
+        }
+
+        async function deletarOS(id) {
+            if (confirm('Deseja excluir esta O.S?')) {
+                const res = await fetch(`/admin/ordens/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    carregarOrdensAdmin();
+                    carregarKPIs();
+                    alert('O.S Excluída!');
+                }
+            }
+        }
+
+        function abrirModal(id, status, valor) {
+            document.getElementById('edit-os-id').value = id;
+            document.getElementById('edit-os-status').value = status;
+            document.getElementById('edit-os-valor').value = valor;
+            document.getElementById('modal-os').style.display = 'flex';
+        }
+        function fecharModal() { document.getElementById('modal-os').style.display = 'none'; }
+
+        async function salvarEdicaoOS() {
+            const id = document.getElementById('edit-os-id').value;
+            const status_servico = document.getElementById('edit-os-status').value;
+            const valor_total = document.getElementById('edit-os-valor').value;
+            const res = await fetch(`/admin/ordens/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status_servico, valor_total })
+            });
+            if (res.ok) {
+                fecharModal();
+                carregarOrdensAdmin();
+                carregarKPIs();
+                alert('O.S Atualizada!');
+            }
+        }
+
+        // --- Gerenciar Usuários ---
+        async function carregarUsuariosAdmin() {
+            const tbody = document.getElementById('tbody-usuarios');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Carregando usuários...</td></tr>';
+
+            try {
+                const res = await fetch('/admin/usuarios');
+                const users = await res.json();
+                
+                tbody.innerHTML = '';
+                
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhum usuário encontrado.</td></tr>';
+                    return;
+                }
+
+                users.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.nome_completo}</td>
+                        <td>${u.username}</td>
+                        <td>${u.email}</td>
+                        <td>${u.perfil}</td>
+                        <td>${new Date(u.data_cadastro).toLocaleDateString()}</td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button onclick="abrirModalUsuario(${u.id_usuario}, '${u.nome_completo}', '${u.email}', '${u.username}', '${u.perfil}')" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #ffc107; color: #000;"><i class="fas fa-edit"></i></button>
+                                <button onclick="deletarUsuario(${u.id_usuario})" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #dc3545;"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: red;">Erro ao carregar usuários. Verifique o servidor.</td></tr>';
+            }
+        }
+
+        function abrirModalUsuario(id, nome, email, username, perfil) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-user-nome').value = nome;
+            document.getElementById('edit-user-email').value = email;
+            document.getElementById('edit-user-username').value = username;
+            document.getElementById('edit-user-perfil').value = perfil;
+            document.getElementById('modal-usuario').style.display = 'flex';
+        }
+        function fecharModalUsuario() { document.getElementById('modal-usuario').style.display = 'none'; }
+
+        async function salvarEdicaoUsuario() {
+            const id = document.getElementById('edit-user-id').value;
+            const nome_completo = document.getElementById('edit-user-nome').value;
+            const email = document.getElementById('edit-user-email').value;
+            const username = document.getElementById('edit-user-username').value;
+            const perfil = document.getElementById('edit-user-perfil').value;
+            const res = await fetch(`/admin/usuarios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome_completo, email, username, perfil })
+            });
+            if (res.ok) {
+                fecharModalUsuario();
+                carregarUsuariosAdmin();
+                alert('Usuário atualizado!');
+            }
+        }
+
+        async function deletarUsuario(id) {
+            if (confirm('Deseja excluir este usuário?')) {
+                const res = await fetch(`/admin/usuarios/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    carregarUsuariosAdmin();
+                    alert('Usuário excluído!');
+                }
+            }
+        }
+
+        // --- Carregar Contatos (Auto-Update) ---
+        async function carregarContatosAdmin() {
+            try {
+                const res = await fetch('/admin/contatos');
+                const contatos = await res.json();
+                const tbody = document.querySelector('#table-contatos tbody');
+                tbody.innerHTML = '';
+
+                if (contatos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhuma mensagem recebida.</td></tr>';
+                    return;
+                }
+
+                contatos.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${c.nome_visitante}</td>
+                        <td>${c.email_visitante}</td>
+                        <td title="${c.mensagem_texto}">${c.mensagem_texto.substring(0, 30)}${c.mensagem_texto.length > 30 ? '...' : ''}</td>
+                        <td>${new Date(c.data_recebimento).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar contatos:', error);
+            }
+        }
+
+        // Atualiza os contatos e KPIs a cada 30 segundos automaticamente
+        setInterval(() => {
+            const dashSection = document.getElementById('admin-dashboard');
+            if (dashSection.classList.contains('active')) {
+                carregarKPIs();
+                carregarContatosAdmin();
+            }
+        }, 30000);
+
+        // --- Lógica de Relatórios e Gráficos ---
+        let charts = {};
+
+        async function carregarGraficosRelatorios() {
+            const colors = ['#ffc107', '#007bff', '#28a745', '#dc3545', '#6610f2', '#fd7e14'];
+
+            try {
+                // 1. Faturamento
+                const resFat = await fetch('/admin/stats/faturamento');
+                const dataFat = await resFat.json();
+                if (dataFat.length > 0) {
+                    renderChart('chart-faturamento', 'line', dataFat.map(d => d.mes), dataFat.map(d => d.total), 'Faturamento R$', '#28a745');
+                }
+
+                // 2. Serviços
+                const resServ = await fetch('/admin/stats/servicos');
+                const dataServ = await resServ.json();
+                if (dataServ.length > 0) {
+                    renderChart('chart-servicos', 'doughnut', dataServ.map(d => d.label), dataServ.map(d => d.total), 'Serviços', colors);
+                }
+
+                // 3. Clientes
+                const resCli = await fetch('/admin/stats/clientes');
+                const dataCli = await resCli.json();
+                if (dataCli.length > 0) {
+                    renderChart('chart-clientes', 'bar', dataCli.map(d => d.mes), dataCli.map(d => d.total), 'Novos Clientes', '#007bff');
+                }
+
+                // 4. Contatos
+                const resCont = await fetch('/admin/stats/contatos');
+                const dataCont = await resCont.json();
+                if (dataCont.length > 0) {
+                    renderChart('chart-contatos', 'bar', dataCont.map(d => d.mes), dataCont.map(d => d.total), 'Mensagens', '#ffc107');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar gráficos:', error);
+            }
+        }
+
+        function renderChart(canvasId, type, labels, data, label, backgroundColor) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (charts[canvasId]) charts[canvasId].destroy();
+
+            charts[canvasId] = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderColor: Array.isArray(backgroundColor) ? backgroundColor.map(c => c) : backgroundColor,
+                        borderWidth: 1,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { 
+                            display: type === 'doughnut',
+                            position: 'bottom',
+                            labels: { color: document.body.classList.contains('dark-theme') ? '#e0e0e0' : '#333' }
+                        }
+                    },
+                    scales: type !== 'doughnut' ? {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { color: document.body.classList.contains('dark-theme') ? '#b0b0b0' : '#666' }
+                        },
+                        x: { 
+                            ticks: { color: document.body.classList.contains('dark-theme') ? '#b0b0b0' : '#666' }
+                        }
+                    } : {}
+                }
+            });
+        }
+
+        // Inicialização
+        carregarKPIs();
+        carregarContatosAdmin();
+    </script>
+</body>
+</html>

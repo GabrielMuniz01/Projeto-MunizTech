@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/44fdb15698.js" crossorigin="anonymous"></script>
+    <!-- Importando o Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <title>Dashboard - MunizTech</title>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Barra Lateral -->
+        <aside class="sidebar">
+            <img src="./assets/logo canva muniztech.png" alt="Logo MunizTech" class="logo">
+            <ul class="sidebar-menu">
+                <li><a onclick="showSection('inicio-section')" id="menu-inicio" class="active"><i class="fas fa-home"></i> Início</a></li>
+                <li><a href="#"><i class="fas fa-laptop-medical"></i> Meus Serviços</a></li>
+                <li><a onclick="showSection('perfil-section')" id="menu-perfil"><i class="fas fa-user"></i> Meu Perfil</a></li>
+                <li><a onclick="showSection('config-section')" id="menu-config"><i class="fas fa-cog"></i> Configurações</a></li>
+                <li><a href="Login.html" style="margin-top: 50px; color: #ff4d4d;" id="btn_sair"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+            </ul>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            
+            <!-- SEÇÃO INÍCIO -->
+            <section id="inicio-section" class="content-section active">
+                <header class="header-dash">
+                    <div>
+                        <h1>Olá, <span id="user-name">Cliente</span>!</h1>
+                        <p>Bem-vindo ao seu painel de acompanhamento.</p>
+                    </div>
+                    <button class="btn-auth" style="padding: 10px 20px;">Solicitar Reparo</button>
+                </header>
+
+                <!-- Cards de Estatísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-list-ul"></i>
+                        <h3>Total de Ordens</h3>
+                        <p id="total-ordens">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Em Reparo</h3>
+                        <p id="em-reparo">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Concluídos</h3>
+                        <p id="concluidos">0</p>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <!-- Gráfico com Chart.js -->
+                    <div class="chart-box">
+                        <h4>Status dos Serviços</h4>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <!-- Tabela de Serviços Recentes -->
+                    <div class="table-box">
+                        <h4>Serviços Recentes</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Equipamento</th>
+                                    <th>Serviço</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO CONFIGURAÇÕES -->
+            <section id="config-section" class="content-section">
+                <header class="header-dash">
+                    <div>
+                        <h1>Configurações</h1>
+                        <p>Personalize a sua experiência no painel.</p>
+                    </div>
+                </header>
+
+                <div class="config-box">
+                    <h4>Preferências de Exibição</h4>
+                    
+                    <div class="config-item">
+                        <div class="config-info">
+                            <h5>Tema do Painel</h5>
+                            <p>Alterne entre o modo claro e o modo escuro.</p>
+                        </div>
+                        <button id="theme-toggle" class="btn-theme">
+                            <i class="fas fa-moon"></i>
+                            <span id="theme-text">Tema Escuro</span>
+                        </button>
+                    </div>
+
+                    <div class="config-item">
+                        <div class="config-info">
+                            <h5>Notificações por E-mail</h5>
+                            <p>Receba atualizações sobre seus serviços no seu e-mail.</p>
+                        </div>
+                        <input type="checkbox" checked style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO MEU PERFIL -->
+            <section id="perfil-section" class="content-section">
+                <header class="header-dash">
+                    <div>
+                        <h1>Meu Perfil</h1>
+                        <p>Suas informações de cadastro.</p>
+                    </div>
+                </header>
+
+                <div class="config-box" style="max-width: 600px;">
+                    <h4>Dados Pessoais</h4>
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" id="perfil-nome" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="text" id="perfil-email" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome de Usuário</label>
+                        <input type="text" id="perfil-username" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Conta</label>
+                        <input type="text" value="Cliente MunizTech" readonly style="color: var(--accent-color); font-weight: bold;">
+                    </div>
+                    
+                    <p style="margin-top: 30px; font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">
+                        * A alteração de dados cadastrais deve ser solicitada através dos canais de suporte abaixo:
+                    </p>
+
+                    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px; color: var(--text-primary);">
+                            <i class="fas fa-envelope" style="color: var(--accent-color);"></i>
+                            <span><strong>E-mail:</strong> muniztech01@outlook.com</span>
+                        </div>
+                        <a href="https://wa.me/5511976147581" target="_blank" class="btn-theme" style="background: #25d366; color: white; width: fit-content; text-decoration: none;">
+                            <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Lógica de Navegação ---
+        function showSection(sectionId) {
+            // Esconde todas as seções
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Remove 'active' de todos os links do menu
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Mostra a seção desejada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Marca o link do menu como ativo
+            if (sectionId === 'inicio-section') document.getElementById('menu-inicio').classList.add('active');
+            if (sectionId === 'perfil-section') {
+                document.getElementById('menu-perfil').classList.add('active');
+                carregarPerfil();
+            }
+            if (sectionId === 'config-section') document.getElementById('menu-config').classList.add('active');
+        }
+
+        // --- Lógica de Tema (Claro/Escuro) ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeText = document.getElementById('theme-text');
+        const themeIcon = themeToggle.querySelector('i');
+
+        // Verifica a preferência salva ou define DARK como padrão
+        const savedTheme = localStorage.getItem('theme');
+        
+        // Se for a primeira vez (null) ou se o tema salvo for 'dark', aplica o escuro
+        if (savedTheme === 'dark' || savedTheme === null) {
+            body.classList.add('dark-theme');
+            updateThemeUI(true);
+        } else {
+            body.classList.remove('dark-theme');
+            updateThemeUI(false);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            const isDark = body.classList.contains('dark-theme');
+            
+            // Salva a preferência
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            updateThemeUI(isDark);
+        });
+
+        function updateThemeUI(isDark) {
+            if (isDark) {
+                themeText.innerText = 'Tema Claro';
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeText.innerText = 'Tema Escuro';
+                themeIcon.className = 'fas fa-moon';
+            }
+        }
+
+        // --- Lógica de Dados do Usuário ---
+        const userId = sessionStorage.getItem('userId');
+        const nameUser = sessionStorage.getItem('nameUser');
+        const userEmail = sessionStorage.getItem('userEmail');
+        const userName = sessionStorage.getItem('userName');
+
+        if (nameUser) {
+            document.getElementById('user-name').innerText = nameUser;
+        }
+
+        if (!userId) {
+            window.location.href = 'Login.html';
+        }
+
+        function carregarPerfil() {
+            document.getElementById('perfil-nome').value = nameUser || 'Não informado';
+            document.getElementById('perfil-email').value = userEmail || 'Não informado';
+            document.getElementById('perfil-username').value = userName || 'Não informado';
+        }
+
+        const btnSair = document.getElementById('btn_sair');
+        btnSair.addEventListener('click', () => {
+            sessionStorage.clear();
+        });
+
+        // --- Lógica do Gráfico e Dados ---
+        async function carregarDadosDashboard() {
+            try {
+                const response = await fetch(`/ordens-servico/${userId}`);
+                const ordens = await response.json();
+
+                if (response.ok) {
+                    atualizarDashboard(ordens);
+                } else {
+                    console.error('Erro ao buscar ordens:', ordens.error);
+                }
+            } catch (error) {
+                console.error('Erro de conexão ao buscar dados:', error);
+            }
+        }
+
+        function atualizarDashboard(ordens) {
+            // 1. Atualizar Estatísticas
+            const total = ordens.length;
+            const emReparo = ordens.filter(o => o.status_servico === 'Manutencao' || o.status_servico === 'Analise' || o.status_servico === 'Aguardando Pecas').length;
+            const concluidos = ordens.filter(o => o.status_servico === 'Pronto' || o.status_servico === 'Entregue').length;
+
+            document.getElementById('total-ordens').innerText = total;
+            document.getElementById('em-reparo').innerText = emReparo;
+            document.getElementById('concluidos').innerText = concluidos;
+
+            // 2. Atualizar Tabela
+            const tbody = document.querySelector('table tbody');
+            tbody.innerHTML = '';
+
+            if (ordens.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhuma ordem de serviço encontrada.</td></tr>';
+            } else {
+                ordens.forEach(os => {
+                    const tr = document.createElement('tr');
+                    let statusClass = '';
+                    let statusTexto = os.status_servico;
+
+                    if (os.status_servico === 'Analise') statusClass = 'status-analise';
+                    else if (os.status_servico === 'Manutencao' || os.status_servico === 'Aguardando Pecas') statusClass = 'status-reparo';
+                    else if (os.status_servico === 'Pronto') statusClass = 'status-pronto';
+                    else if (os.status_servico === 'Entregue') statusClass = 'status-entregue';
+
+                    tr.innerHTML = `
+                        <td>${os.equipamento_modelo}</td>
+                        <td>${os.titulo_servico}</td>
+                        <td><span class="status-badge ${statusClass}">${statusTexto}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // 3. Atualizar Gráfico
+            const contagemStatus = {
+                'Analise': ordens.filter(o => o.status_servico === 'Analise').length,
+                'Manutencao': ordens.filter(o => o.status_servico === 'Manutencao' || o.status_servico === 'Aguardando Pecas').length,
+                'Pronto': ordens.filter(o => o.status_servico === 'Pronto' || o.status_servico === 'Entregue').length
+            };
+
+            statusChart.data.datasets[0].data = [
+                contagemStatus['Analise'],
+                contagemStatus['Manutencao'],
+                contagemStatus['Pronto']
+            ];
+            statusChart.update();
+        }
+
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Em Análise', 'Em Reparo', 'Concluído'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#ffc107', '#007bff', '#28a745'],
+                    borderColor: ['#e0a800', '#0069d9', '#218838'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        carregarDadosDashboard();
+
+        // --- Sincronização Automática (Auto-Update) ---
+        // Atualiza os dados do dashboard a cada 30 segundos se o cliente estiver na tela inicial
+        setInterval(() => {
+            const inicioSection = document.getElementById('inicio-section');
+            if (inicioSection.classList.contains('active')) {
+                carregarDadosDashboard();
+            }
+            console.log('Dashboard atualizado automaticamente');
+        }, 30000); // 30000ms = 30 segundos
+        
+
+    </script>
+</body>
+</html>

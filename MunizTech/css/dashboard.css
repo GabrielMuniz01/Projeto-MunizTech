@@ -1,0 +1,329 @@
+ :root {
+     /* Cores Tema Claro (Padrão) */
+     --bg-dashboard: #f4f7f6;
+     --card-white: #ffffff;
+     --text-primary: #333333;
+     --text-secondary: #666666;
+     --sidebar-bg: #1a1a1a;
+     --sidebar-text: #cccccc;
+     --accent-color: #007bff;
+     --border-color: #eeeeee;
+     --table-header: #f8f9fa;
+ }
+
+ body.dark-theme {
+     /* Cores Tema Escuro */
+     --bg-dashboard: #121212;
+     --card-white: #1e1e1e;
+     --text-primary: #e0e0e0;
+     --text-secondary: #b0b0b0;
+     --sidebar-bg: #000000;
+     --sidebar-text: #aaaaaa;
+     --accent-color: #3793ff;
+     --border-color: #333333;
+     --table-header: #252525;
+ }
+
+ body {
+     background-color: var(--bg-dashboard);
+     color: var(--text-primary);
+     font-family: 'Montserrat', sans-serif;
+     margin: 0;
+     transition: background-color 0.3s, color 0.3s;
+ }
+
+ .dashboard-container {
+     display: flex;
+     min-height: 100vh;
+ }
+
+ /* Sidebar */
+ .sidebar {
+     width: 250px;
+     background-color: var(--sidebar-bg);
+     color: white;
+     padding: 20px;
+     display: flex;
+     flex-direction: column;
+     transition: background-color 0.3s;
+ }
+
+ .sidebar .logo {
+     width: 100%;
+     max-width: 150px;
+     margin-bottom: 30px;
+     align-self: center;
+ }
+
+ .sidebar-menu {
+     list-style: none;
+     padding: 0;
+ }
+
+ .sidebar-menu li {
+     margin-bottom: 20px;
+ }
+
+ .sidebar-menu a {
+     color: var(--sidebar-text);
+     text-decoration: none;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     transition: 0.3s;
+     cursor: pointer;
+ }
+
+ .sidebar-menu a:hover,
+ .sidebar-menu a.active {
+     color: white;
+ }
+
+ /* Conteúdo Principal */
+ .main-content {
+     flex: 1;
+     padding: 30px;
+ }
+
+ .content-section {
+     display: none;
+     /* Esconde todas as seções por padrão */
+ }
+
+ .content-section.active {
+     display: block;
+     /* Mostra apenas a seção ativa */
+ }
+
+ .header-dash {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: 30px;
+ }
+
+ .header-dash h1 {
+     margin: 0;
+     color: var(--text-primary);
+ }
+
+ .header-dash p {
+     color: var(--text-secondary);
+ }
+
+ /* Cards de Resumo */
+ .stats-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+     gap: 20px;
+     margin-bottom: 30px;
+ }
+
+ .stat-card {
+     background: var(--card-white);
+     padding: 20px;
+     border-radius: 10px;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     text-align: center;
+     transition: background-color 0.3s;
+ }
+
+ .stat-card i {
+     font-size: 1.5rem;
+     color: var(--accent-color);
+     margin-bottom: 10px;
+ }
+
+ .stat-card h3 {
+     font-size: 0.9rem;
+     color: var(--text-secondary);
+     margin: 0;
+ }
+
+ .stat-card p {
+     font-size: 1.8rem;
+     font-weight: bold;
+     margin: 10px 0 0 0;
+     color: var(--text-primary);
+ }
+
+ /* Área dos Gráficos e Tabelas */
+ .charts-row {
+     display: grid;
+     grid-template-columns: 1fr 2fr;
+     gap: 20px;
+     margin-bottom: 30px;
+ }
+
+ .chart-box,
+ .table-box,
+ .config-box {
+     background: var(--card-white);
+     padding: 20px;
+     border-radius: 10px;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     transition: background-color 0.3s;
+ }
+
+ .chart-box h4,
+ .table-box h4,
+ .config-box h4 {
+     margin-top: 0;
+     margin-bottom: 20px;
+     font-size: 1.1rem;
+     color: var(--text-primary);
+ }
+
+ /* Tabela de Serviços */
+ .table-box {
+     overflow-x: auto;
+     height: 400px;
+ }
+
+ .table-box::-webkit-scrollbar { 
+     height: 8px; /* Altura da barra de rolagem horizontal */ 
+     width: 8px; /* Largura da barra de rolagem vertical */
+ }
+
+ 
+ .table-box::-webkit-scrollbar-track {
+     background: var(--card-white); /* Cor de fundo da trilha do scroll */
+ }
+
+ .table-box::-webkit-scrollbar-thumb {
+     background: var(--accent-color); /* Cor do polegar da barra de rolagem */
+     border-radius: 4px; /* Arredondamento do polegar */
+ }
+
+ table {
+     width: 100%;
+     border-collapse: collapse;
+ }
+
+ table th {
+     background-color: var(--table-header);
+     color: var(--text-primary);
+ }
+
+ table th,
+ table td {
+     text-align: left;
+     padding: 12px;
+     border-bottom: 1px solid var(--border-color);
+     color: var(--text-primary);
+ }
+
+ .status-badge {
+     padding: 5px 10px;
+     border-radius: 20px;
+     font-size: 0.75rem;
+     font-weight: bold;
+ }
+
+ .status-analise { background: #ffc107; color: #000; }
+ .status-reparo { background: #007bff; color: #fff; }
+ .status-pronto { background: #28a745; color: #fff; }
+ .status-entregue { background: #6c757d; color: #fff; }
+
+ /* Estilos de Formulários e Inputs */
+ .form-group {
+     margin-bottom: 20px;
+     width: 100%;
+     display: flex;
+     flex-direction: column;
+     gap: 8px;
+ }
+
+ .form-group label {
+     font-size: 0.9rem;
+     font-weight: 600;
+     color: var(--text-secondary);
+     display: block;
+     text-align: left;
+ }
+
+ .form-group input, 
+ .form-group select, 
+ .form-group textarea {
+     width: 100%;
+     padding: 12px;
+     border-radius: 8px;
+     border: 1px solid var(--border-color);
+     background-color: var(--card-white);
+     color: var(--text-primary);
+     font-family: inherit;
+     font-size: 1rem;
+     box-sizing: border-box; /* Garante que o padding não aumente o tamanho final */
+     transition: border-color 0.3s, box-shadow 0.3s;
+ }
+
+ .form-group input:focus {
+     outline: none;
+     border-color: var(--accent-color);
+     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+ }
+
+ .form-group input[readonly] {
+     background-color: var(--bg-dashboard);
+     cursor: not-allowed;
+     opacity: 0.8;
+ }
+
+
+ /* Estilos da Tela de Configuração */
+ .config-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 15px 0;
+     border-bottom: 1px solid var(--border-color);
+ }
+
+ .config-item:last-child {
+     border-bottom: none;
+ }
+
+ .config-info h5 {
+     margin: 0;
+     font-size: 1rem;
+     color: var(--text-primary);
+ }
+
+ .config-info p {
+     margin: 5px 0 0 0;
+     font-size: 0.85rem;
+     color: var(--text-secondary);
+ }
+
+ .btn-theme {
+     padding: 10px 20px;
+     border: none;
+     border-radius: 5px;
+     cursor: pointer;
+     font-weight: 600;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     background-color: var(--accent-color);
+     color: white;
+     transition: 0.3s;
+ }
+
+ .btn-theme:hover {
+     opacity: 0.9;
+ }
+
+ @media (max-width: 900px) {
+     .charts-row {
+         grid-template-columns: 1fr;
+     }
+
+     .dashboard-container {
+         flex-direction: column;
+     }
+
+     .sidebar {
+         width: 100%;
+         box-sizing: border-box;
+     }
+ }

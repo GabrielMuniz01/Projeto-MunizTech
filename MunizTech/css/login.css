@@ -1,0 +1,213 @@
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ AUTH PAGE (LOGIN) \\\\\\\\\\\\\\\\\\\\\\\\\\ */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, rgba(10, 132, 255, 0.1), transparent),
+                radial-gradient(circle at bottom left, rgba(0, 212, 255, 0.05), transparent);
+    padding: 100px 20px 40px; /* Aumentado de 20px para 100px para dar espaço à Navbar fixa */
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-box {
+    background: rgba(26, 31, 38, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.auth-form h2 {
+    color: var(--text-inverse);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.auth-form p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+/* Estilização refinada para os inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+    transition: 0.3s ease all;
+}
+
+.input-group input:focus,
+.input-group input:not(:placeholder-shown) {
+    border-color: var(--primary-blue);
+    background: rgba(10, 132, 255, 0.05);
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+    top: -12px;
+    left: 10px;
+    font-size: 0.8rem;
+    color: var(--secondary-blue);
+    background: var(--bg-dark);
+    padding: 0 5px;
+}
+
+/* Opções de Formulário (Lembrar de mim e Esqueci a senha) */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 0.85rem;
+}
+
+.form-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.form-options label:hover {
+    color: var(--text-primary);
+}
+
+.form-options input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.form-options input[type="checkbox"]:checked {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.form-options input[type="checkbox"]:checked::after {
+    content: '✔';
+    position: absolute;
+    color: white;
+    font-size: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.form-options a {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.form-options a:hover {
+    color: var(--primary-blue);
+    text-decoration: underline;
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.btn-auth:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(10, 132, 255, 0.4);
+}
+
+.btn-auth:disabled {
+    opacity: 0.9;
+    cursor: not-allowed;
+}
+
+/* Estado de carregamento do botão */
+.btn-auth.loading .btn-text {
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* Container para o Spinner 3D dentro do botão */
+.btn-auth .spinner-container {
+    display: none;
+    position: absolute;
+    transform: scale(0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-auth.loading .spinner-container {
+    display: flex;
+}
+
+#login-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: none;
+}
+
+#login-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: block;
+}
+
+#login-message.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    display: block;
+}
