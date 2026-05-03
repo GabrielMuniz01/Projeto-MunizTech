@@ -6,12 +6,22 @@ const express = require('express'); // Importa o framework Express para criar o 
 const mysql = require('mysql2'); // Importa o módulo mysql2 para conectar ao banco de dados MySQL
 const cors = require('cors'); // Importa o módulo cors para permitir requisições de diferentes origens (útil para desenvolvimento local);
 const { body, validationResult } = require('express-validator'); // Importa ferramentas de validação
+const path = require('path'); // Importa o módulo path para lidar com caminhos de arquivos
 
 const app = express();
 
 // Configurações básicas
 app.use(cors()); // Libera o acesso para seu site
 app.use(express.json()); // Permite que API entenda dados em formato JSON
+
+// Configura o Express para servir os arquivos estáticos (HTML, CSS, Imagens, JS do navegador)
+// Isso permite que você acesse http://localhost:3000 e veja o seu Index.html
+app.use(express.static(__dirname));
+
+// Rota para garantir que a página inicial seja o Index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Index.html'));
+});
 
 // conexao com o banco de dados
 const db = mysql.createConnection({
@@ -59,7 +69,7 @@ app.post('/contato', [
     const { nome, email, mensagem } = req.body;
     // Usando os nomes das colunas da sua tabela tbl_contatos
     const sql = 'INSERT INTO tbl_contatos (nome_visitante, email_visitante, mensagem_texto) VALUES (?, ?, ?)';
-    
+
     db.query(sql, [nome, email, mensagem], (err, result) => {
         if (err) {
             console.error('Erro ao salvar mensagem no banco:', err);
@@ -82,7 +92,7 @@ app.post('/login', [
 
     const { username, password } = req.body;
     const sql = 'SELECT * FROM tbl_usuarios WHERE (username = ? OR email = ?) AND senha =?';
-    
+
     db.query(sql, [username, username, password], (err, results) => {
         if (err) {
             console.error('Erro ao consultar o banco de dados:', err);
@@ -97,7 +107,8 @@ app.post('/login', [
                     id: usuario.id_usuario,
                     nome: usuario.nome_completo,
                     email: usuario.email,
-                    username: usuario.username
+                    username: usuario.username,
+                    perfil: usuario.perfil
                 }
             });
             console.log('Login realizado com sucesso!', usuario);
@@ -106,6 +117,7 @@ app.post('/login', [
         }
     });
 });
+
 
 
 // Rota para cadastrar um novo usuário
@@ -123,7 +135,7 @@ app.post('/usuario', [
     const { nome, email, username, password } = req.body;
     // O banco espera 'nome_completo', então mapeamos 'nome' para ele
     const sql = 'INSERT INTO tbl_usuarios (nome_completo, email, username, senha) VALUES (?, ?, ?, ?)';
-    
+
     db.query(sql, [nome, email, username, password], (err, result) => {
         if (err) {
             console.error('Erro ao cadastrar usuário:', err);
@@ -140,7 +152,7 @@ app.post('/usuario', [
 // Rota para buscar ordens de serviço de um cliente específico
 app.get('/ordens-servico/:clienteId', (req, res) => {
     const { clienteId } = req.params;
-    
+
     // Consulta SQL que junta a tabela de OS com a de Categorias para pegar o nome do serviço
     const sql = `
         SELECT 
@@ -163,8 +175,269 @@ app.get('/ordens-servico/:clienteId', (req, res) => {
     });
 });
 
+// --- ROTAS ADMINISTRATIVAS ---
+
+// Rota para o resumo de estatísticas (KPIs)
+app.get('/admin/resumo', (req, res) => {
+    const sqlStats = `
+    SELECT 
+            (SELECT COUNT(*) FROM tbl_usuarios WHERE perfil = 'cliente') as totalClientes,
+            (SELECT COUNT(*) FROM tbl_ordens_servico) as totalOrdens,
+            (SELECT COUNT(*) FROM tbl_ordens_servico WHERE status_servico = 'Analise' OR status_servico = 'Manutencao') as ordensAtivas,
+            (SELECT SUM(valor_total) FROM tbl_ordens_servico WHERE status_servico = 'Entregue') as faturamento
+        FROM DUAL;
+    `;
+
+    db.query(sqlStats, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar resumo admin:', err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
+        res.status(200).json(results[0]);
+    });
+});
+
+// Rota para listar TODAS as ordens de serviço (com nome do cliente)
+app.get('/admin/ordens', (req, res) => {
+    const sql = `
+        SELECT 
+            os.*, 
+            u.nome_completo as nome_cliente,
+            cat.titulo_servico
+        FROM tbl_ordens_servico os
+        JOIN tbl_usuarios u ON os.id_cliente = u.id_usuario
+        JOIN tbl_categorias_servicos cat ON os.id_categoria = cat.id_categoria
+        ORDER BY os.data_abertura DESC
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar todas as ordens:', err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// Rota para atualizar uma ordem de serviço (Status e Valor)
+app.patch('/admin/ordens/:id', (req, res) => {
+    const { id } = req.params;
+    const { status_servico, valor_total } = req.body;
+
+    const sql = 'UPDATE tbl_ordens_servico SET status_servico = ?, valor_total = ? WHERE id_os = ?';
+    db.query(sql, [status_servico, valor_total, id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar ordem:', err);
+            return res.status(500).json({ error: 'Erro ao atualizar ordem' });
+        }
+        res.status(200).json({ message: 'Ordem atualizada com sucesso!' });
+    });
+});
+
+// Rota para listar todos os usuários com perfil de cliente (para o select de nova O.S.)
+app.get('/admin/clientes', (req, res) => {
+    const sql = "SELECT id_usuario, nome_completo FROM tbl_usuarios WHERE perfil = 'cliente' ORDER BY nome_completo ASC";
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Erro ao buscar clientes' });
+        res.status(200).json(results);
+    });
+});
+
+// Rota para listar todas as categorias de serviço (para o select de nova O.S.)
+app.get('/admin/categorias', (req, res) => {
+    const sql = "SELECT id_categoria, titulo_servico FROM tbl_categorias_servicos ORDER BY titulo_servico ASC";
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Erro ao buscar categorias' });
+        res.status(200).json(results);
+    });
+});
+
+// Rota para criar uma nova Ordem de Serviço
+app.post('/admin/ordens', (req, res) => {
+    const { id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico } = req.body;
+    const sql = `
+        INSERT INTO tbl_ordens_servico 
+        (id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico) 
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    db.query(sql, [id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total || 0, status_servico || 'Analise'], (err, result) => {
+        if (err) {
+            console.error('Erro ao criar O.S:', err);
+            return res.status(500).json({ error: 'Erro ao criar ordem de serviço' });
+        }
+        res.status(201).json({ message: 'Ordem de serviço criada com sucesso!', id: result.insertId });
+    });
+});
+
+// Rota para deletar uma Ordem de Serviço
+app.delete('/admin/ordens/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'DELETE FROM tbl_ordens_servico WHERE id_os = ?';
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar O.S:', err);
+            return res.status(500).json({ error: 'Erro ao deletar ordem de serviço' });
+        }
+        res.status(200).json({ message: 'Ordem de serviço excluída com sucesso!' });
+    });
+});
+
+// Rota para listar todos os usuários
+app.get('/admin/usuarios', (req, res) => {
+    console.log('--- Buscando lista completa de usuários ---');
+    const sql = 'SELECT id_usuario, nome_completo, email, username, perfil, data_cadastro FROM tbl_usuarios ORDER BY data_cadastro DESC';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar usuários:', err);
+            return res.status(500).json({ error: 'Erro ao buscar usuários' });
+        }
+        console.log(`✅ ${results.length} usuários listados.`);
+        res.status(200).json(results);
+    });
+});
+
+// Rota para atualizar um usuário
+app.put('/admin/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome_completo, email, username, perfil } = req.body;
+
+    const sql = 'UPDATE tbl_usuarios SET nome_completo = ?, email = ?, username = ?, perfil = ? WHERE id_usuario = ?';
+    db.query(sql, [nome_completo, email, username, perfil, id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar usuário:', err);
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ error: 'E-mail ou nome de usuário já existem' });
+            }
+            return res.status(500).json({ error: 'Erro ao atualizar usuário' });
+        }
+        res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+    });
+});
+
+// Rota para deletar um usuário
+app.delete('/admin/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+
+    // Primeiro, vamos verificar se o usuário não está tentando se deletar (opcional, mas seguro)
+    const sql = 'DELETE FROM tbl_usuarios WHERE id_usuario = ?';
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar usuário:', err);
+            return res.status(500).json({ error: 'Erro ao deletar usuário. Verifique se ele possui ordens de serviço vinculadas.' });
+        }
+        res.status(200).json({ message: 'Usuário deletado com sucesso!' });
+    });
+});
+
+// Rota para listar mensagens de contato (para o administrador)
+app.get('/admin/contatos', (req, res) => {
+    const sql = 'SELECT * FROM tbl_contatos ORDER BY data_recebimento DESC LIMIT 10';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar contatos:', err);
+            return res.status(500).json({ error: 'Erro ao buscar mensagens' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// --- ESTATÍSTICAS PARA GRÁFICOS (ADMIN) ---
+
+// 1. Faturamento Mensal (Últimos 6 meses)
+app.get('/admin/stats/faturamento', (req, res) => {
+    const sql = `
+        SELECT 
+            DATE_FORMAT(data_abertura, '%m/%Y') as mes, 
+            SUM(valor_total) as total 
+        FROM tbl_ordens_servico 
+        WHERE status_servico = 'Entregue' 
+        GROUP BY mes 
+        ORDER BY MIN(data_abertura) ASC 
+        LIMIT 6
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Erro no SQL de faturamento:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// 2. Serviços por Categoria (Visão Geral)
+app.get('/admin/stats/servicos', (req, res) => {
+    const sql = `
+        SELECT 
+            cat.titulo_servico as label, 
+            COUNT(os.id_os) as total 
+        FROM tbl_ordens_servico os 
+        JOIN tbl_categorias_servicos cat ON os.id_categoria = cat.id_categoria 
+        GROUP BY cat.id_categoria, cat.titulo_servico
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Erro no SQL de serviços:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// 3. Fluxo de Novos Clientes (Mensal)
+app.get('/admin/stats/clientes', (req, res) => {
+    const sql = `
+        SELECT 
+            DATE_FORMAT(data_cadastro, '%m/%Y') as mes, 
+            COUNT(id_usuario) as total 
+        FROM tbl_usuarios 
+        WHERE perfil = 'cliente' 
+        GROUP BY mes 
+        ORDER BY MIN(data_cadastro) ASC 
+        LIMIT 6
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Erro no SQL de clientes:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// 4. Fluxo de Contatos Recebidos
+app.get('/admin/stats/contatos', (req, res) => {
+    const sql = `
+        SELECT 
+            DATE_FORMAT(data_recebimento, '%m/%Y') as mes, 
+            COUNT(id_contato) as total 
+        FROM tbl_contatos 
+        GROUP BY mes 
+        ORDER BY MIN(data_recebimento) ASC 
+        LIMIT 6
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Erro no SQL de contatos:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(200).json(results);
+    });
+});
+
 // Fazendo o servidor "Rodar" na porta 3000
-const PORT = 3000; // Define a porta em que o servidor irá escutar (neste caso, 3000)
-app.listen(PORT, () => { // Inicia o servidor e começa a escutar as requisições na porta definida
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`); // Exibe uma mensagem no console indicando que o servidor está rodando
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`
+    ===========================================================================
+     __  __ _    _ _   _ _____ ______   _______ ______ _____ _    _ 
+    |  \\/  | |  | | \\ | |_   _|___  /  |__   __|  ____/ ____| |  | |
+    | \\  / | |  | |  \\| | | |    / /      | |  | |__ | |    | |__| |
+    | |\\/| | |  | | . \` | | |   / /       | |  |  __|| |    |  __  |
+    | |  | | |__| | |\\  |_| |_ / /__      | |  | |___| |____| |  | |
+    |_|  |_|\\____/|_| \\_|_____/_____|     |_|  |______\\_____|_|  |_|
+    ===========================================================================
+    🚀 Servidor MunizTech rodando em:
+    http://localhost:${PORT}
+
+    (Segure Ctrl e clique no link acima para abrir no navegador)
+    `);
 });

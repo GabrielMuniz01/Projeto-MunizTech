@@ -145,12 +145,12 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    registerMessage.textContent = '✅ Usuário cadastrado com sucesso! Redirecionando...';
+                    registerMessage.textContent = '✅ Usuário cadastrado com sucesso! Retornando ao painel...';
                     registerMessage.className = 'success';
 
                     setTimeout(() => {
-                        window.location.href = 'Login.html';
-                    }, 4500);
+                        window.location.href = 'admin.html';
+                    }, 2000);
 
                 } else {
                     registerMessage.textContent = '❌ ' + (data.error || 'Erro ao cadastrar usuário.');

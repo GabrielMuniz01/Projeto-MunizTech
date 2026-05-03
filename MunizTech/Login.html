@@ -138,7 +138,7 @@
         btnLogin.disabled = true;
 
         try {
-            const response = await fetch('http://localhost:3000/login', {
+            const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -157,10 +157,15 @@
                 sessionStorage.setItem('nameUser', data.user.nome);
                 sessionStorage.setItem('userEmail', data.user.email);
                 sessionStorage.setItem('userName', data.user.username);
+                sessionStorage.setItem('userPerfil', data.user.perfil);
 
-                // Redireciona após um curto delay para o usuário ver a mensagem de sucesso
+                // Redireciona com base no perfil
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    if (data.user.perfil === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
                 }, 1500);
 
             } else {
