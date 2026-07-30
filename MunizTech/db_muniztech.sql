@@ -29,13 +29,22 @@ CREATE TABLE IF NOT EXISTS tbl_ordens_servico (
     id_categoria INT NOT NULL,
     equipamento_modelo VARCHAR(100) NOT NULL,
     descricao_problema TEXT,
-    status_servico ENUM('Analise', 'Manutencao', 'Aguardando Pecas', 'Pronto', 'Entregue') DEFAULT 'Analise',
+    status_servico ENUM('Pendente', 'Analise', 'Manutencao', 'Aguardando Pecas', 'Pronto', 'Entregue') DEFAULT 'Pendente',
     valor_total DECIMAL(10, 2) DEFAULT 0.00,
     data_abertura DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_conclusao DATE,
+        -- Admin que criou a O.S (pode ser NULL se criado por sistema)
+        creating_admin_id INT NULL,
+        -- Admin que aceitou/fechou a O.S (pode ser NULL enquanto não aceito)
+        accepted_by_admin_id INT NULL,
     CONSTRAINT fk_os_cliente FOREIGN KEY (id_cliente) REFERENCES tbl_usuarios(id_usuario) ON DELETE CASCADE,
     CONSTRAINT fk_os_categoria FOREIGN KEY (id_categoria) REFERENCES tbl_categorias_servicos(id_categoria)
 ) ENGINE=InnoDB;
+
+-- Adiciona chaves estrangeiras para os admins (usar ON DELETE SET NULL para preservar histórico)
+ALTER TABLE tbl_ordens_servico
+    ADD CONSTRAINT fk_ordens_creating_admin FOREIGN KEY (creating_admin_id) REFERENCES tbl_usuarios(id_usuario) ON DELETE SET NULL,
+    ADD CONSTRAINT fk_ordens_accepted_admin FOREIGN KEY (accepted_by_admin_id) REFERENCES tbl_usuarios(id_usuario) ON DELETE SET NULL;
 
 -- 5. Tabela de Contatos (Mensagens do Site)
 CREATE TABLE IF NOT EXISTS tbl_contatos (
