@@ -34,6 +34,26 @@
             width: 100%; padding: 10px; border: 1px solid var(--border-color);
             background: var(--bg-dashboard); color: var(--text-primary); border-radius: 5px;
         }
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: #00bfff;
+            font-weight: 700;
+            /* background: rgba(0, 191, 255, 0.12); */
+            padding: 4px 9px;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+        }
+        .user-badge i {
+            font-size: 1.65rem;
+            color: #00bfff;
+        }
+        #user-name {
+            display: inline-block;
+            margin-left: 0.15rem;
+            color: #00bfff;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +80,7 @@
                     <div>
                         <h1>Painel Administrativo</h1>
                         <p>Visão geral do negócio.</p>
-                    </div>
+                         <span class="user-badge"><i class="fas fa-user-circle"></i> <p>Olá,<span id="user-name">[Nome do Usuário]</span>!</p></span>
                 </header>
 
                 <div class="stats-grid">
@@ -297,6 +317,10 @@
     </div>
 
     <script>
+
+        const usuarioExibido = sessionStorage.getItem('userFullName') || sessionStorage.getItem('nameUser') || localStorage.getItem('userFullName') || localStorage.getItem('nameUser') || 'Administrador';
+        document.getElementById('user-name').innerText = usuarioExibido;
+
         // --- Navegação e Temas ---
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
