@@ -38,6 +38,16 @@ db.connect((err) => {
         return;
     }
     console.log('Conexão com o banco de dados estabelecida com sucesso!');
+
+    // Garantir que o enum status_servico aceite o valor 'Pendente' em bancos já existentes
+    const alterEnum = `ALTER TABLE tbl_ordens_servico MODIFY status_servico ENUM('Pendente','Analise','Manutencao','Aguardando Pecas','Pronto','Entregue') DEFAULT 'Pendente'`;
+    db.query(alterEnum, (alterErr) => {
+        if (alterErr) {
+            console.error('Erro ao ajustar enum status_servico:', alterErr.message || alterErr);
+        } else {
+            console.log('Enum status_servico ajustado com sucesso.');
+        }
+    });
 });
 
 // 2. Criando a nossa primeira ROTA (O caminho que o site vai chamar)
@@ -199,14 +209,19 @@ app.get('/admin/resumo', (req, res) => {
 
 // Rota para listar TODAS as ordens de serviço (com nome do cliente)
 app.get('/admin/ordens', (req, res) => {
+    // Retorna ordens com nome do cliente, do admin que criou e do admin que aceitou (quando houver)
     const sql = `
         SELECT 
             os.*, 
             u.nome_completo as nome_cliente,
-            cat.titulo_servico
+            cat.titulo_servico,
+            ca.nome_completo as criado_por,
+            aa.nome_completo as aceito_por
         FROM tbl_ordens_servico os
         JOIN tbl_usuarios u ON os.id_cliente = u.id_usuario
         JOIN tbl_categorias_servicos cat ON os.id_categoria = cat.id_categoria
+        LEFT JOIN tbl_usuarios ca ON os.creating_admin_id = ca.id_usuario
+        LEFT JOIN tbl_usuarios aa ON os.accepted_by_admin_id = aa.id_usuario
         ORDER BY os.data_abertura DESC
     `;
     db.query(sql, (err, results) => {
@@ -221,10 +236,19 @@ app.get('/admin/ordens', (req, res) => {
 // Rota para atualizar uma ordem de serviço (Status e Valor)
 app.patch('/admin/ordens/:id', (req, res) => {
     const { id } = req.params;
-    const { status_servico, valor_total } = req.body;
+    const { status_servico, valor_total, accepted_by_admin_id } = req.body;
 
-    const sql = 'UPDATE tbl_ordens_servico SET status_servico = ?, valor_total = ? WHERE id_os = ?';
-    db.query(sql, [status_servico, valor_total, id], (err, result) => {
+    // Monta dinamicamente a query dependendo se accepted_by_admin_id foi enviado
+    let sql = 'UPDATE tbl_ordens_servico SET status_servico = ?, valor_total = ?';
+    const params = [status_servico, valor_total];
+    if (accepted_by_admin_id) {
+        sql += ', accepted_by_admin_id = ?';
+        params.push(accepted_by_admin_id);
+    }
+    sql += ' WHERE id_os = ?';
+    params.push(id);
+
+    db.query(sql, params, (err, result) => {
         if (err) {
             console.error('Erro ao atualizar ordem:', err);
             return res.status(500).json({ error: 'Erro ao atualizar ordem' });
@@ -252,14 +276,16 @@ app.get('/admin/categorias', (req, res) => {
 });
 
 // Rota para criar uma nova Ordem de Serviço
+// Rota para criar uma nova Ordem de Serviço (guarda também qual admin criou)
 app.post('/admin/ordens', (req, res) => {
-    const { id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico } = req.body;
+    const { id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico, creating_admin_id } = req.body;
+    const initialStatus = status_servico || (creating_admin_id ? 'Analise' : 'Pendente');
     const sql = `
         INSERT INTO tbl_ordens_servico 
-        (id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        (id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total, status_servico, creating_admin_id) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    db.query(sql, [id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total || 0, status_servico || 'Analise'], (err, result) => {
+    db.query(sql, [id_cliente, id_categoria, equipamento_modelo, descricao_problema, valor_total || 0, initialStatus, creating_admin_id || null], (err, result) => {
         if (err) {
             console.error('Erro ao criar O.S:', err);
             return res.status(500).json({ error: 'Erro ao criar ordem de serviço' });

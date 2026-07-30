@@ -133,17 +133,25 @@
                     <button onclick="abrirModalNovaOS()" class="btn-theme" style="background: #28a745;"><i class="fas fa-plus"></i> Nova O.S</button>
                 </header>
                 <div class="table-box">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <label style="font-weight:600; color:var(--text-primary);">Filtrar por Responsável:</label>
+                        <select id="filter-responsavel" style="padding:6px 8px; border-radius:6px; background:var(--bg-dashboard); color:var(--text-primary);">
+                            <option value="">Todos</option>
+                        </select>
+                        <button id="clear-filter" class="btn-theme" style="background:#6c757d; padding:6px 10px;">Limpar</button>
+                    </div>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Equipamento</th>
-                                <th>Serviço</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Equipamento</th>
+                                        <th>Serviço</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Responsável</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
                         <tbody id="tbody-ordens">
                             <!-- Preenchido via JS -->
                         </tbody>
@@ -267,12 +275,17 @@
             <div class="form-group">
                 <label>Status</label>
                 <select id="edit-os-status">
+                    <option value="Pendente">Pendente</option>
                     <option value="Analise">Em Análise</option>
                     <option value="Manutencao">Em Manutenção</option>
                     <option value="Aguardando Pecas">Aguardando Peças</option>
                     <option value="Pronto">Pronto</option>
                     <option value="Entregue">Entregue</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label>Responsável atual</label>
+                <p id="modal-responsavel" style="margin:0; font-weight:700; color:var(--text-primary);">-</p>
             </div>
             <div class="form-group">
                 <label>Valor Total (R$)</label>
@@ -373,26 +386,82 @@
         }
 
         // --- Gerenciar O.S ---
+        function escapeHtml(str) {
+            if (!str && str !== 0) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function carregarOrdensAdmin() {
             const res = await fetch('/admin/ordens');
             const ordens = await res.json();
             const tbody = document.getElementById('tbody-ordens');
             tbody.innerHTML = '';
+
+            // Preenche select de responsáveis de forma segura
+            const selectResp = document.getElementById('filter-responsavel');
+            const respSet = new Set();
             ordens.forEach(os => {
+                const r = (os.aceito_por || os.criado_por || '').trim();
+                if (r) respSet.add(r);
+            });
+            if (selectResp) {
+                const selectedValue = selectResp.value || '';
+                // limpa e adiciona opções com createElement para evitar problemas com caracteres
+                selectResp.innerHTML = '';
+                const optAll = document.createElement('option'); optAll.value = ''; optAll.textContent = 'Todos'; selectResp.appendChild(optAll);
+                Array.from(respSet).sort().forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r;
+                    o.textContent = r;
+                    if (r === selectedValue) o.selected = true;
+                    selectResp.appendChild(o);
+                });
+                selectResp.onchange = carregarOrdensAdmin;
+                const clearBtn = document.getElementById('clear-filter');
+                if (clearBtn) clearBtn.onclick = () => { selectResp.value = ''; carregarOrdensAdmin(); };
+            }
+
+            const filtro = (selectResp ? (selectResp.value || '').trim().toLowerCase() : '');
+
+            ordens.forEach(os => {
+                const responsavel = (os.aceito_por || os.criado_por || '-').trim();
+                if (filtro && responsavel.toLowerCase() !== filtro) return; // pula se não corresponde ao filtro
+
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${os.nome_cliente}</td>
-                    <td>${os.equipamento_modelo}</td>
-                    <td>${os.titulo_servico}</td>
-                    <td>R$ ${parseFloat(os.valor_total).toFixed(2)}</td>
-                    <td><span class="status-badge status-${os.status_servico.toLowerCase().replace(' ', '-')}">${os.status_servico}</span></td>
-                    <td>
-                        <div style="display: flex; gap: 5px;">
-                            <button onclick="abrirModal(${os.id_os}, '${os.status_servico}', ${os.valor_total})" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #ffc107; color: #000;"><i class="fas fa-edit"></i></button>
-                            <button onclick="deletarOS(${os.id_os})" class="btn-theme" style="padding: 5px 10px; font-size: 0.8rem; background: #dc3545;"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                `;
+
+                const tdCliente = document.createElement('td'); tdCliente.textContent = os.nome_cliente || '-'; tr.appendChild(tdCliente);
+                const tdEquip = document.createElement('td'); tdEquip.textContent = os.equipamento_modelo || '-'; tr.appendChild(tdEquip);
+                const tdServ = document.createElement('td'); tdServ.textContent = os.titulo_servico || '-'; tr.appendChild(tdServ);
+                const tdValor = document.createElement('td'); tdValor.textContent = `R$ ${parseFloat(os.valor_total || 0).toFixed(2)}`; tr.appendChild(tdValor);
+
+                const tdStatus = document.createElement('td');
+                const span = document.createElement('span');
+                span.className = 'status-badge status-' + (os.status_servico || '').toString().toLowerCase().replace(/\s+/g, '-');
+                span.textContent = os.status_servico || '';
+                tdStatus.appendChild(span);
+                tr.appendChild(tdStatus);
+
+                const tdResp = document.createElement('td'); tdResp.textContent = responsavel || '-'; tr.appendChild(tdResp);
+
+                const tdActions = document.createElement('td');
+                const div = document.createElement('div'); div.style.display = 'flex'; div.style.gap = '5px';
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'btn-theme'; btnEdit.style.padding = '5px 10px'; btnEdit.style.fontSize = '0.8rem'; btnEdit.style.background = '#ffc107'; btnEdit.style.color = '#000';
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.addEventListener('click', () => abrirModal(os.id_os, os.status_servico, os.valor_total, responsavel));
+                const btnDel = document.createElement('button');
+                btnDel.className = 'btn-theme'; btnDel.style.padding = '5px 10px'; btnDel.style.fontSize = '0.8rem'; btnDel.style.background = '#dc3545';
+                btnDel.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDel.addEventListener('click', () => deletarOS(os.id_os));
+                div.appendChild(btnEdit); div.appendChild(btnDel);
+                tdActions.appendChild(div);
+                tr.appendChild(tdActions);
+
                 tbody.appendChild(tr);
             });
         }
@@ -416,7 +485,8 @@
                 id_categoria: document.getElementById('new-os-categoria').value,
                 equipamento_modelo: document.getElementById('new-os-equipamento').value,
                 descricao_problema: document.getElementById('new-os-problema').value,
-                valor_total: document.getElementById('new-os-valor').value
+                valor_total: document.getElementById('new-os-valor').value,
+                creating_admin_id: sessionStorage.getItem('userId') || null
             };
             const res = await fetch('/admin/ordens', {
                 method: 'POST',
@@ -442,10 +512,12 @@
             }
         }
 
-        function abrirModal(id, status, valor) {
+        function abrirModal(id, status, valor, responsavel) {
             document.getElementById('edit-os-id').value = id;
             document.getElementById('edit-os-status').value = status;
             document.getElementById('edit-os-valor').value = valor;
+            const mr = document.getElementById('modal-responsavel');
+            if (mr) mr.innerText = responsavel || '-';
             document.getElementById('modal-os').style.display = 'flex';
         }
         function fecharModal() { document.getElementById('modal-os').style.display = 'none'; }
@@ -454,10 +526,11 @@
             const id = document.getElementById('edit-os-id').value;
             const status_servico = document.getElementById('edit-os-status').value;
             const valor_total = document.getElementById('edit-os-valor').value;
+            const acceptedBy = (status_servico && status_servico !== 'Pendente') ? sessionStorage.getItem('userId') : null;
             const res = await fetch(`/admin/ordens/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status_servico, valor_total })
+                body: JSON.stringify({ status_servico, valor_total, accepted_by_admin_id: acceptedBy })
             });
             if (res.ok) {
                 fecharModal();

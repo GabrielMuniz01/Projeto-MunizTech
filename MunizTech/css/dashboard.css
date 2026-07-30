@@ -220,6 +220,7 @@
      font-weight: bold;
  }
 
+ .status-pendente { background: #6c757d; color: #fff; }
  .status-analise { background: #ffc107; color: #000; }
  .status-reparo { background: #007bff; color: #fff; }
  .status-pronto { background: #28a745; color: #fff; }

@@ -287,7 +287,7 @@
         function atualizarDashboard(ordens) {
             // Estatísticas
             const total = ordens.length;
-            const emReparo = ordens.filter(o => ['Manutencao', 'Analise', 'Aguardando Pecas'].includes(o.status_servico)).length;
+            const emReparo = ordens.filter(o => ['Pendente', 'Manutencao', 'Analise', 'Aguardando Pecas'].includes(o.status_servico)).length;
             const concluidos = ordens.filter(o => ['Pronto', 'Entregue'].includes(o.status_servico)).length;
 
             document.getElementById('total-ordens').innerText = total;
@@ -303,7 +303,8 @@
             } else {
                 ordens.forEach(os => {
                     const tr = document.createElement('tr');
-                    let statusClass = os.status_servico === 'Analise' ? 'status-analise' : 
+let statusClass = os.status_servico === 'Pendente' ? 'status-pendente' :
+                                  os.status_servico === 'Analise' ? 'status-analise' :
                                   (['Manutencao', 'Aguardando Pecas'].includes(os.status_servico) ? 'status-reparo' : 
                                   (os.status_servico === 'Pronto' ? 'status-pronto' : 'status-entregue'));
 
