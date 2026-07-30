@@ -99,90 +99,92 @@
         </div>
     </footer>
 
+    <script>
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-bar ul');
+        const menuOverlay = document.querySelector('.menu-overlay');
 
-</body>
+        function toggleMenu() {
+            navToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            const isExpanded = navToggle.classList.contains('active');
+            navToggle.setAttribute('aria-expanded', isExpanded);
+            document.body.style.overflow = isExpanded ? 'hidden' : 'auto';
+        }
 
-</html>
+        navToggle.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
 
-<script>
-    const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-bar ul');
-    const menuOverlay = document.querySelector('.menu-overlay');
+        const loginForm = document.getElementById('login-form');
 
-    function toggleMenu() {
-        navToggle.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-        const isExpanded = navToggle.classList.contains('active');
-        navToggle.setAttribute('aria-expanded', isExpanded);
-        document.body.style.overflow = isExpanded ? 'hidden' : 'auto';
-    }
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Impede o envio tradicional do formulário
 
-    navToggle.addEventListener('click', toggleMenu);
-    menuOverlay.addEventListener('click', toggleMenu);
+            const btnLogin = document.getElementById('btn-login');
+            const loginMessage = document.getElementById('login-message');
+            const username = document.getElementById('login-user').value;
+            const password = document.getElementById('login-pass').value;
 
-    const loginForm = document.getElementById('login-form');
+            // Limpa mensagens anteriores e ativa estado de carregamento
+            loginMessage.textContent = '';
+            loginMessage.className = '';
+            btnLogin.classList.add('loading');
+            btnLogin.disabled = true;
 
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Impede o envio tradicional do formulário
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
 
-        const btnLogin = document.getElementById('btn-login');
-        const loginMessage = document.getElementById('login-message');
-        const username = document.getElementById('login-user').value;
-        const password = document.getElementById('login-pass').value;
+                const data = await response.json();
 
-        // Limpa mensagens anteriores e ativa estado de carregamento
-        loginMessage.textContent = '';
-        loginMessage.className = '';
-        btnLogin.classList.add('loading');
-        btnLogin.disabled = true;
+                if (response.ok) {
+                    // Sucesso no login
+                    loginMessage.textContent = '✅ Login bem-sucedido! Redirecionando...';
+                    loginMessage.className = 'success';
 
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
+                    sessionStorage.setItem('userId', data.user.id);
+                    sessionStorage.setItem('nameUser', data.user.nome);
+                    sessionStorage.setItem('userFullName', data.user.nome);
+                    sessionStorage.setItem('userEmail', data.user.email);
+                    sessionStorage.setItem('userName', data.user.username);
+                    sessionStorage.setItem('userPerfil', data.user.perfil);
 
-            const data = await response.json();
+                    localStorage.setItem('nameUser', data.user.nome);
+                    localStorage.setItem('userFullName', data.user.nome);
+                    localStorage.setItem('userName', data.user.username);
 
-            if (response.ok) {
-                // Sucesso no login
-                loginMessage.textContent = '✅ Login bem-sucedido! Redirecionando...';
-                loginMessage.className = 'success';
+                    // Redireciona com base no perfil
+                    setTimeout(() => {
+                        if (data.user.perfil === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
 
-                sessionStorage.setItem('userId', data.user.id);
-                sessionStorage.setItem('nameUser', data.user.nome);
-                sessionStorage.setItem('userEmail', data.user.email);
-                sessionStorage.setItem('userName', data.user.username);
-                sessionStorage.setItem('userPerfil', data.user.perfil);
-
-                // Redireciona com base no perfil
-                setTimeout(() => {
-                    if (data.user.perfil === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'dashboard.html';
-                    }
-                }, 1500);
-
-            } else {
-                // Erro retornado pelo servidor
-                loginMessage.textContent = '❌ ' + (data.error || 'Usuário ou senha incorretos.');
+                } else {
+                    // Erro retornado pelo servidor
+                    loginMessage.textContent = '❌ ' + (data.error || 'Usuário ou senha incorretos.');
+                    loginMessage.className = 'error';
+                    btnLogin.classList.remove('loading');
+                    btnLogin.disabled = false;
+                }
+            } catch (error) {
+                console.error('Erro ao enviar dados para o servidor:', error);
+                loginMessage.textContent = '❌ Erro de conexão. Verifique se o servidor está rodando.';
                 loginMessage.className = 'error';
                 btnLogin.classList.remove('loading');
                 btnLogin.disabled = false;
             }
-        } catch (error) {
-            console.error('Erro ao enviar dados para o servidor:', error);
-            loginMessage.textContent = '❌ Erro de conexão. Verifique se o servidor está rodando.';
-            loginMessage.className = 'error';
-            btnLogin.classList.remove('loading');
-            btnLogin.disabled = false;
-        }
-    });
+        });
+    </script>
 
+</body>
 
-</script>
+</html>

@@ -39,7 +39,7 @@
                         <h1>Olá, <span id="user-name">Cliente</span>!</h1>
                         <p>Bem-vindo ao seu painel de acompanhamento.</p>
                     </div>
-                    <button class="btn-auth" style="padding: 10px 20px;">Solicitar Reparo</button>
+                    <button class="btn-auth" id="btn-solicitar-reparo-topo" style="padding: 10px 20px;">Solicitar Reparo</button>
                 </header>
 
                 <!-- Cards de Estatísticas -->
@@ -167,22 +167,60 @@
         </main>
     </div>
 
-    <script>
-        // --- Lógica de Navegação ---
-        function showSection(sectionId) {
-            // Esconde todas as seções
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            // Remove 'active' de todos os links do menu
-            document.querySelectorAll('.sidebar-menu a').forEach(link => {
-                link.classList.remove('active');
-            });
+    <!-- Modal de Solicitação de Reparo -->
+    <div id="modal-reparo" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="btn-fechar-modal">&times;</span>
+            <h2>Solicitar Novo Reparo</h2>
+            <p>Preencha os detalhes do seu equipamento para iniciarmos a análise.</p>
+            
+            <form id="form-solicitar-reparo">
+                <div class="form-group">
+                    <label for="equipamento">Equipamento e Modelo</label>
+                    <input type="text" id="equipamento" placeholder="Ex: Notebook Dell Vostro 3500" required>
+                </div>
 
-            // Mostra a seção desejada
+                <div class="form-group">
+                    <label for="categoria">Tipo de Serviço</label>
+                    <select id="categoria" required>
+                        <option value="" disabled selected>Selecione uma categoria</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="problema">Descrição do Problema</label>
+                    <textarea id="problema" rows="4" placeholder="Descreva o que está acontecendo..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-enviar-reparo">Enviar Solicitação</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Dados Globais e Segurança ---
+        const userId = sessionStorage.getItem('userId');
+        const nameUser = sessionStorage.getItem('nameUser');
+        const userEmail = sessionStorage.getItem('userEmail');
+        const userName = sessionStorage.getItem('userName');
+
+        // Se não tiver ID, volta para o login
+        if (!userId) {
+            window.location.href = 'Login.html';
+        }
+
+        // Exibe o nome do usuário
+        if (nameUser) {
+            document.getElementById('user-name').innerText = nameUser;
+        }
+
+        // --- 2. Lógica de Navegação ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(link => link.classList.remove('active'));
+
             document.getElementById(sectionId).classList.add('active');
             
-            // Marca o link do menu como ativo
             if (sectionId === 'inicio-section') document.getElementById('menu-inicio').classList.add('active');
             if (sectionId === 'perfil-section') {
                 document.getElementById('menu-perfil').classList.add('active');
@@ -191,16 +229,23 @@
             if (sectionId === 'config-section') document.getElementById('menu-config').classList.add('active');
         }
 
-        // --- Lógica de Tema (Claro/Escuro) ---
+        function carregarPerfil() {
+            document.getElementById('perfil-nome').value = nameUser || 'Não informado';
+            document.getElementById('perfil-email').value = userEmail || 'Não informado';
+            document.getElementById('perfil-username').value = userName || 'Não informado';
+        }
+
+        document.getElementById('btn_sair').addEventListener('click', () => {
+            sessionStorage.clear();
+        });
+
+        // --- 3. Lógica de Tema (Claro/Escuro) ---
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         const themeText = document.getElementById('theme-text');
         const themeIcon = themeToggle.querySelector('i');
 
-        // Verifica a preferência salva ou define DARK como padrão
         const savedTheme = localStorage.getItem('theme');
-        
-        // Se for a primeira vez (null) ou se o tema salvo for 'dark', aplica o escuro
         if (savedTheme === 'dark' || savedTheme === null) {
             body.classList.add('dark-theme');
             updateThemeUI(true);
@@ -212,10 +257,7 @@
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-theme');
             const isDark = body.classList.contains('dark-theme');
-            
-            // Salva a preferência
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
             updateThemeUI(isDark);
         });
 
@@ -229,95 +271,58 @@
             }
         }
 
-        // --- Lógica de Dados do Usuário ---
-        const userId = sessionStorage.getItem('userId');
-        const nameUser = sessionStorage.getItem('nameUser');
-        const userEmail = sessionStorage.getItem('userEmail');
-        const userName = sessionStorage.getItem('userName');
-
-        if (nameUser) {
-            document.getElementById('user-name').innerText = nameUser;
-        }
-
-        if (!userId) {
-            window.location.href = 'Login.html';
-        }
-
-        function carregarPerfil() {
-            document.getElementById('perfil-nome').value = nameUser || 'Não informado';
-            document.getElementById('perfil-email').value = userEmail || 'Não informado';
-            document.getElementById('perfil-username').value = userName || 'Não informado';
-        }
-
-        const btnSair = document.getElementById('btn_sair');
-        btnSair.addEventListener('click', () => {
-            sessionStorage.clear();
-        });
-
-        // --- Lógica do Gráfico e Dados ---
+        // --- 4. Carregamento de Dados (Gráficos e Tabela) ---
         async function carregarDadosDashboard() {
             try {
                 const response = await fetch(`/ordens-servico/${userId}`);
                 const ordens = await response.json();
-
                 if (response.ok) {
                     atualizarDashboard(ordens);
-                } else {
-                    console.error('Erro ao buscar ordens:', ordens.error);
                 }
             } catch (error) {
-                console.error('Erro de conexão ao buscar dados:', error);
+                console.error('Erro ao buscar dados:', error);
             }
         }
 
         function atualizarDashboard(ordens) {
-            // 1. Atualizar Estatísticas
+            // Estatísticas
             const total = ordens.length;
-            const emReparo = ordens.filter(o => o.status_servico === 'Manutencao' || o.status_servico === 'Analise' || o.status_servico === 'Aguardando Pecas').length;
-            const concluidos = ordens.filter(o => o.status_servico === 'Pronto' || o.status_servico === 'Entregue').length;
+            const emReparo = ordens.filter(o => ['Manutencao', 'Analise', 'Aguardando Pecas'].includes(o.status_servico)).length;
+            const concluidos = ordens.filter(o => ['Pronto', 'Entregue'].includes(o.status_servico)).length;
 
             document.getElementById('total-ordens').innerText = total;
             document.getElementById('em-reparo').innerText = emReparo;
             document.getElementById('concluidos').innerText = concluidos;
 
-            // 2. Atualizar Tabela
+            // Tabela
             const tbody = document.querySelector('table tbody');
             tbody.innerHTML = '';
 
             if (ordens.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhuma ordem de serviço encontrada.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhuma ordem encontrada.</td></tr>';
             } else {
                 ordens.forEach(os => {
                     const tr = document.createElement('tr');
-                    let statusClass = '';
-                    let statusTexto = os.status_servico;
-
-                    if (os.status_servico === 'Analise') statusClass = 'status-analise';
-                    else if (os.status_servico === 'Manutencao' || os.status_servico === 'Aguardando Pecas') statusClass = 'status-reparo';
-                    else if (os.status_servico === 'Pronto') statusClass = 'status-pronto';
-                    else if (os.status_servico === 'Entregue') statusClass = 'status-entregue';
+                    let statusClass = os.status_servico === 'Analise' ? 'status-analise' : 
+                                  (['Manutencao', 'Aguardando Pecas'].includes(os.status_servico) ? 'status-reparo' : 
+                                  (os.status_servico === 'Pronto' ? 'status-pronto' : 'status-entregue'));
 
                     tr.innerHTML = `
                         <td>${os.equipamento_modelo}</td>
                         <td>${os.titulo_servico}</td>
-                        <td><span class="status-badge ${statusClass}">${statusTexto}</span></td>
+                        <td><span class="status-badge ${statusClass}">${os.status_servico}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // 3. Atualizar Gráfico
-            const contagemStatus = {
+            // Gráfico
+            const contagem = {
                 'Analise': ordens.filter(o => o.status_servico === 'Analise').length,
-                'Manutencao': ordens.filter(o => o.status_servico === 'Manutencao' || o.status_servico === 'Aguardando Pecas').length,
-                'Pronto': ordens.filter(o => o.status_servico === 'Pronto' || o.status_servico === 'Entregue').length
+                'Reparo': ordens.filter(o => ['Manutencao', 'Aguardando Pecas'].includes(o.status_servico)).length,
+                'Concluido': ordens.filter(o => ['Pronto', 'Entregue'].includes(o.status_servico)).length
             };
-
-            statusChart.data.datasets[0].data = [
-                contagemStatus['Analise'],
-                contagemStatus['Manutencao'],
-                contagemStatus['Pronto']
-            ];
+            statusChart.data.datasets[0].data = [contagem.Analise, contagem.Reparo, contagem.Concluido];
             statusChart.update();
         }
 
@@ -329,31 +334,89 @@
                 datasets: [{
                     data: [0, 0, 0],
                     backgroundColor: ['#ffc107', '#007bff', '#28a745'],
-                    borderColor: ['#e0a800', '#0069d9', '#218838'],
                     borderWidth: 1
                 }]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
+        // Inicia o carregamento
         carregarDadosDashboard();
-
-        // --- Sincronização Automática (Auto-Update) ---
-        // Atualiza os dados do dashboard a cada 30 segundos se o cliente estiver na tela inicial
         setInterval(() => {
-            const inicioSection = document.getElementById('inicio-section');
-            if (inicioSection.classList.contains('active')) {
-                carregarDadosDashboard();
-            }
-            console.log('Dashboard atualizado automaticamente');
-        }, 30000); // 30000ms = 30 segundos
-        
+            if (document.getElementById('inicio-section').classList.contains('active')) carregarDadosDashboard();
+        }, 30000);
 
+        // --- 5. Lógica do Modal de Solicitação ---
+        const modal = document.getElementById('modal-reparo');
+        const btnAbrirModal = document.getElementById('btn-solicitar-reparo-topo');
+        const btnFecharModal = document.getElementById('btn-fechar-modal');
+        const formReparo = document.getElementById('form-solicitar-reparo');
+        const selectCategoria = document.getElementById('categoria');
+
+        btnAbrirModal.addEventListener('click', () => {
+            modal.style.display = 'block';
+            carregarCategorias();
+        });
+
+        btnFecharModal.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+        async function carregarCategorias() {
+            try {
+                console.log('Buscando categorias...');
+                const res = await fetch('/servicos');
+                const cats = await res.json();
+                
+                console.log('Categorias recebidas:', cats);
+
+                selectCategoria.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+                
+                if (cats.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = "";
+                    opt.textContent = "Nenhuma categoria cadastrada";
+                    selectCategoria.appendChild(opt);
+                    return;
+                }
+
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id_categoria;
+                    opt.textContent = c.titulo_servico;
+                    selectCategoria.appendChild(opt);
+                });
+            } catch (err) { 
+                console.error('Erro ao carregar categorias:', err);
+                alert('Erro ao carregar categorias de serviço. Verifique se o servidor está rodando.');
+            }
+        }
+
+        formReparo.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                id_cliente: userId,
+                id_categoria: selectCategoria.value,
+                equipamento_modelo: document.getElementById('equipamento').value,
+                descricao_problema: document.getElementById('problema').value
+            };
+
+            try {
+                const res = await fetch('/admin/ordens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+
+                if (res.ok) {
+                    alert('Solicitação enviada!');
+                    modal.style.display = 'none';
+                    formReparo.reset();
+                    carregarDadosDashboard();
+                } else {
+                    alert('Erro ao enviar solicitação.');
+                }
+            } catch (err) { console.error(err); }
+        });
     </script>
 </body>
 </html>
